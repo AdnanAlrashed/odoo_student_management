@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Student Management System Security Groups -->
+        
+        <!-- Base Student Management Group -->
+        <record id="group_student_management_base" model="res.groups">
+            <field name="name">Student Management: Base User</field>
+            <field name="category_id" ref="base.module_category_human_resources"/>
+            <field name="comment">Base group for all student management system users</field>
+        </record>
+
+        <!-- Admin Group (HOD) -->
+        <record id="group_student_management_admin" model="res.groups">
+            <field name="name">Student Management: Administrator</field>
+            <field name="category_id" ref="base.module_category_human_resources"/>
+            <field name="comment">Full access to student management system - equivalent to HOD in Django system</field>
+            <field name="implied_ids" eval="[(4, ref('group_student_management_base'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Staff Group -->
+        <record id="group_student_management_staff" model="res.groups">
+            <field name="name">Student Management: Staff</field>
+            <field name="category_id" ref="base.module_category_human_resources"/>
+            <field name="comment">Staff access to student management system - can manage attendance, results, and their own data</field>
+            <field name="implied_ids" eval="[(4, ref('group_student_management_base'))]"/>
+        </record>
+
+        <!-- Student Group -->
+        <record id="group_student_management_student" model="res.groups">
+            <field name="name">Student Management: Student</field>
+            <field name="category_id" ref="base.module_category_human_resources"/>
+            <field name="comment">Student access to student management system - can view their own data only</field>
+            <field name="implied_ids" eval="[(4, ref('group_student_management_base'))]"/>
+        </record>
+
+        <!-- Record Rules for Data Access Control -->
+        
+        <!-- Student Record Rules -->
+        <record id="student_rule_admin" model="ir.rule">
+            <field name="name">Student: Admin Access</field>
+            <field name="model_id" ref="model_student_management_student"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="student_rule_staff" model="ir.rule">
+            <field name="name">Student: Staff Access</field>
+            <field name="model_id" ref="model_student_management_student"/>
+            <field name="domain_force">[('course_id.subject_ids.staff_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="student_rule_student" model="ir.rule">
+            <field name="name">Student: Student Access</field>
+            <field name="model_id" ref="model_student_management_student"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_student'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Staff Record Rules -->
+        <record id="staff_rule_admin" model="ir.rule">
+            <field name="name">Staff: Admin Access</field>
+            <field name="model_id" ref="model_student_management_staff"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="staff_rule_staff" model="ir.rule">
+            <field name="name">Staff: Staff Access</field>
+            <field name="model_id" ref="model_student_management_staff"/>
+            <field name="domain_force">['|', ('user_id', '=', user.id), ('id', '=', user.staff_id.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Additional rule for staff to access their own profile data -->
+        <record id="staff_profile_rule_staff" model="ir.rule">
+            <field name="name">Staff: Profile Access</field>
+            <field name="model_id" ref="model_student_management_staff"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Attendance Record Rules -->
+        <record id="attendance_rule_admin" model="ir.rule">
+            <field name="name">Attendance: Admin Access</field>
+            <field name="model_id" ref="model_student_management_attendance"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="attendance_rule_staff" model="ir.rule">
+            <field name="name">Attendance: Staff Access</field>
+            <field name="model_id" ref="model_student_management_attendance"/>
+            <field name="domain_force">[('subject_id.staff_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="attendance_rule_student" model="ir.rule">
+            <field name="name">Attendance: Student Access</field>
+            <field name="model_id" ref="model_student_management_attendance"/>
+            <field name="domain_force">[('student_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_student'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Student Result Record Rules -->
+        <record id="student_result_rule_admin" model="ir.rule">
+            <field name="name">Student Result: Admin Access</field>
+            <field name="model_id" ref="model_student_management_student_result"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="student_result_rule_staff" model="ir.rule">
+            <field name="name">Student Result: Staff Access</field>
+            <field name="model_id" ref="model_student_management_student_result"/>
+            <field name="domain_force">[('subject_id.staff_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="student_result_rule_student" model="ir.rule">
+            <field name="name">Student Result: Student Access</field>
+            <field name="model_id" ref="model_student_management_student_result"/>
+            <field name="domain_force">[('student_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_student'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Leave Report Record Rules -->
+        <record id="leave_student_rule_admin" model="ir.rule">
+            <field name="name">Leave Student: Admin Access</field>
+            <field name="model_id" ref="model_student_management_leave_report_student"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="leave_student_rule_student" model="ir.rule">
+            <field name="name">Leave Student: Student Access</field>
+            <field name="model_id" ref="model_student_management_leave_report_student"/>
+            <field name="domain_force">[('student_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_student'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="leave_staff_rule_admin" model="ir.rule">
+            <field name="name">Leave Staff: Admin Access</field>
+            <field name="model_id" ref="model_student_management_leave_report_staff"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="leave_staff_rule_staff" model="ir.rule">
+            <field name="name">Leave Staff: Staff Access</field>
+            <field name="model_id" ref="model_student_management_leave_report_staff"/>
+            <field name="domain_force">[('staff_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Feedback Record Rules -->
+        <record id="feedback_student_rule_admin" model="ir.rule">
+            <field name="name">Feedback Student: Admin Access</field>
+            <field name="model_id" ref="model_student_management_feedback_student"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="feedback_student_rule_student" model="ir.rule">
+            <field name="name">Feedback Student: Student Access</field>
+            <field name="model_id" ref="model_student_management_feedback_student"/>
+            <field name="domain_force">[('student_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_student'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="feedback_staff_rule_admin" model="ir.rule">
+            <field name="name">Feedback Staff: Admin Access</field>
+            <field name="model_id" ref="model_student_management_feedback_staff"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="feedback_staff_rule_staff" model="ir.rule">
+            <field name="name">Feedback Staff: Staff Access</field>
+            <field name="model_id" ref="model_student_management_feedback_staff"/>
+            <field name="domain_force">[('staff_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Notification Record Rules -->
+        <record id="notification_student_rule_admin" model="ir.rule">
+            <field name="name">Notification Student: Admin Access</field>
+            <field name="model_id" ref="model_student_management_notification_student"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="notification_student_rule_student" model="ir.rule">
+            <field name="name">Notification Student: Student Access</field>
+            <field name="model_id" ref="model_student_management_notification_student"/>
+            <field name="domain_force">[('student_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_student'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="notification_staff_rule_admin" model="ir.rule">
+            <field name="name">Notification Staff: Admin Access</field>
+            <field name="model_id" ref="model_student_management_notification_staff"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="notification_staff_rule_staff" model="ir.rule">
+            <field name="name">Notification Staff: Staff Access</field>
+            <field name="model_id" ref="model_student_management_notification_staff"/>
+            <field name="domain_force">[('staff_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

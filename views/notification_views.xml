@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Staff Notification List View -->
+    <record id="notification_staff_list_view" model="ir.ui.view">
+        <field name="name">student.notification.staff.list</field>
+        <field name="model">student_management.notification_staff</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="staff_id"/>
+                <field name="message"/>
+                <field name="is_read"/>
+                <!-- <field name="created_at"/> -->
+            </list>
+        </field>
+    </record>
+
+    <!-- Staff Notification Form View -->
+    <record id="notification_staff_form_view" model="ir.ui.view">
+        <field name="name">student.notification.staff.form</field>
+        <field name="model">student_management.notification_staff</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="staff_id"/>
+                            <field name="is_read"/>
+                        </group>
+                        <group>
+                            <!-- <field name="created_at" readonly="1"/>
+                            <field name="updated_at" readonly="1"/> -->
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Message">
+                            <field name="message"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Staff Notification Search View -->
+    <record id="notification_staff_search_view" model="ir.ui.view">
+        <field name="name">student.notification.staff.search</field>
+        <field name="model">student_management.notification_staff</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="staff_id"/>
+                <field name="message"/>
+                <filter string="Read" name="read" domain="[('is_read', '=', True)]"/>
+                <filter string="Unread" name="unread" domain="[('is_read', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Staff" name="group_staff" context="{'group_by': 'staff_id'}"/>
+                    <filter string="Read Status" name="group_read" context="{'group_by': 'is_read'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Staff Notification Action -->
+    <record id="notification_staff_action" model="ir.actions.act_window">
+        <field name="name">Staff Notifications</field>
+        <field name="res_model">student_management.notification_staff</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="notification_staff_search_view"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No staff notifications yet!
+            </p>
+        </field>
+    </record>
+
+    <!-- Student Notification List View -->
+    <record id="notification_student_list_view" model="ir.ui.view">
+        <field name="name">student.notification.student.list</field>
+        <field name="model">student_management.notification_student</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="student_id"/>
+                <field name="message"/>
+                <field name="is_read"/>
+                <!-- <field name="created_at"/> -->
+            </list>
+        </field>
+    </record>
+
+    <!-- Student Notification Form View -->
+    <record id="notification_student_form_view" model="ir.ui.view">
+        <field name="name">student.notification.student.form</field>
+        <field name="model">student_management.notification_student</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="student_id"/>
+                            <field name="is_read"/>
+                        </group>
+                        <group>
+                            <!-- <field name="created_at" readonly="1"/>
+                            <field name="updated_at" readonly="1"/> -->
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Message">
+                            <field name="message"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Student Notification Search View -->
+    <record id="notification_student_search_view" model="ir.ui.view">
+        <field name="name">student.notification.student.search</field>
+        <field name="model">student_management.notification_student</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="student_id"/>
+                <field name="message"/>
+                <filter string="Read" name="read" domain="[('is_read', '=', True)]"/>
+                <filter string="Unread" name="unread" domain="[('is_read', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Student" name="group_student" context="{'group_by': 'student_id'}"/>
+                    <filter string="Read Status" name="group_read" context="{'group_by': 'is_read'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Student Notification Action -->
+    <record id="notification_student_action" model="ir.actions.act_window">
+        <field name="name">Student Notifications</field>
+        <field name="res_model">student_management.notification_student</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="notification_student_search_view"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No student notifications yet!
+            </p>
+        </field>
+    </record>
+</odoo>
+

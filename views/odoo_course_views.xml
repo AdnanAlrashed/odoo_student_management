@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Course list View -->
+    <record id="view_course_list" model="ir.ui.view">
+        <field name="name">student_management.course.list</field>
+        <field name="model">student_management.course</field>
+        <field name="type">qweb</field>
+        <field name="arch" type="xml">
+            <list string="Courses" default_order="course_name">
+                <field name="course_name"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="student_count"/>
+                <field name="subject_count"/>
+                <field name="create_date"/>
+                <field name="write_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Course Form View -->
+    <record id="view_course_form" model="ir.ui.view">
+        <field name="name">student_management.course.form</field>
+        <field name="model">student_management.course</field>
+        <field name="arch" type="xml">
+            <form string="Course">
+                <header>
+                    <field name="active" statusbar_visible="active,archived"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="course_name" placeholder="Course Name" required="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="student_count" readonly="1"/>
+                            <field name="subject_count" readonly="1"/>
+                            <field name="create_date" readonly="1"/>
+                            <field name="write_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Students" name="students">
+                            <field name="student_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="session_year_id"/>
+                                    <field name="gender"/>
+                                    <field name="active"/>
+                                    <field name="create_date"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Subjects" name="subjects">
+                            <field name="subject_ids" readonly="1">
+                                <list>
+                                    <field name="subject_name"/>
+                                    <field name="staff_id"/>
+                                    <field name="active"/>
+                                    <field name="create_date"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Statistics" name="statistics">
+                            <group>
+                                <group string="Student Statistics">
+                                    <field name="student_count" readonly="1"/>
+                                    <label for="active_students"/>
+                                    <div>
+                                        <field name="active_students" readonly="1" class="oe_inline"/> active students
+                                    </div>
+                                </group>
+                                <group string="Subject Statistics">
+                                    <field name="subject_count" readonly="1"/>
+                                    <label for="active_subjects"/>
+                                    <div>
+                                        <field name="active_subjects" readonly="1" class="oe_inline"/> active subjects
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter reload_on_follower="True"/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Course Kanban View -->
+    <record id="view_course_kanban" model="ir.ui.view">
+        <field name="name">student_management.course.kanban</field>
+        <field name="model">student_management.course</field>
+        <field name="type">qweb</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="id"/>
+                <field name="course_name"/>
+                <field name="active"/>
+                <field name="student_count"/>
+                <field name="subject_count"/>
+                <field name="create_date"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top mb16">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="course_name"/>
+                                    </strong>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <i class="fa fa-users"/> <field name="student_count"/> Students
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-book"/> <field name="subject_count"/> Subjects
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="active" widget="boolean_toggle"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="create_date" widget="date"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Course Search View -->
+    <record id="view_course_search" model="ir.ui.view">
+        <field name="name">student_management.course.search</field>
+        <field name="model">student_management.course</field>
+        <field name="type">qweb</field>
+        <field name="arch" type="xml">
+            <search string="Search Courses">
+                <field name="course_name" string="Course Name" filter_domain="[('course_name', 'ilike', self)]"/>
+                <separator/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="inactive" string="Inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter name="has_students" string="Has Students" domain="[('student_count', '>', 0)]"/>
+                <filter name="has_subjects" string="Has Subjects" domain="[('subject_count', '>', 0)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_active" string="Status" context="{'group_by': 'active'}"/>
+                    <filter name="group_by_create_date" string="Creation Date" context="{'group_by': 'create_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Course Action -->
+    <record id="action_course" model="ir.actions.act_window">
+        <field name="name">Courses</field>
+        <field name="res_model">student_management.course</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first course!
+            </p>
+            <p>
+                Courses are the main academic programs offered by your institution.
+                Students enroll in courses and subjects are assigned to courses.
+            </p>
+        </field>
+    </record>
+    <menuitem id="menu_course"
+                   name="Courses"
+                   parent="menu_academic_management"
+                   action="action_course"
+                   sequence="20"/>
+</odoo>
+
+
+

@@ -1,0 +1,24 @@
+<odoo>
+    <data>
+        <!-- تحديث النموذج الخاص بشاشة الشريك -->
+        <record id="view_users_form_inherit" model="ir.ui.view">
+            <field name="name">res.users.form.inherit</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <!-- إضافة الحقول قبل أول مجموعة في النموذج -->
+                <xpath expr="//form/sheet" position="inside">
+                    <group name="school_info" string="School Information">
+                        <field name="user_type"/>
+                        <field name="staff_id"/>
+                        <field name="student_id"/>
+                        <field name="is_student_management_admin" widget="boolean_toggle" options="{'terminology': 'Admin'}"/>
+                        <field name="is_student_management_staff" widget="boolean_toggle" options="{'terminology': 'Staff'}"/>
+                        <field name="is_student_management_student" widget="boolean_toggle" options="{'terminology': 'Student'}"/>
+
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

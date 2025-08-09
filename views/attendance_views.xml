@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Student Notification list View -->
+        <record id="view_notification_student_list" model="ir.ui.view">
+            <field name="name">student_management.notification_student.list</field>
+            <field name="model">student_management.notification_student</field>
+            <field name="arch" type="xml">
+                <list string="Student Notifications" default_order="create_date desc">
+                    <field name="student_id"/>
+                    <field name="title"/>
+                    <field name="notification_type"/>
+                    <field name="priority"/>
+                    <field name="is_read" widget="boolean_toggle"/>
+                    <field name="create_date"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Student Notification Form View -->
+        <record id="view_notification_student_form" model="ir.ui.view">
+            <field name="name">student_management.notification_student.form</field>
+            <field name="model">student_management.notification_student</field>
+            <field name="arch" type="xml">
+                <form string="Student Notification">
+                    <header>
+                        <button name="action_mark_as_read" type="object" string="Mark as Read" 
+                                class="btn-primary" invisible="[('is_read', '=', True)]"/>
+                        <button name="action_mark_as_unread" type="object" string="Mark as Unread" 
+                                class="btn-secondary" invisible="[('is_read', '=', False)]"/>
+                        <field name="is_read" widget="statusbar" statusbar_visible="False,True"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="title" placeholder="Notification Title" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="student_id" required="1" options="{'no_create': True}"/>
+                                <field name="notification_type"/>
+                                <field name="priority"/>
+                            </group>
+                            <group>
+                                <field name="is_read"/>
+                                <field name="create_date" readonly="1"/>
+                                <field name="write_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="message" placeholder="Notification Message" required="1"/>
+                        </group>
+                    </sheet>
+                    <chatter reload_on_follower="True"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Student Notification Search View -->
+        <record id="view_notification_student_search" model="ir.ui.view">
+            <field name="name">student_management.notification_student.search</field>
+            <field name="model">student_management.notification_student</field>
+            <field name="arch" type="xml">
+                <search string="Search Student Notifications">
+                    <field name="student_id" string="Student"/>
+                    <field name="title" string="Title" filter_domain="[('title', 'ilike', self)]"/>
+                    <field name="notification_type" string="Type"/>
+                    <field name="priority" string="Priority"/>
+                    <separator/>
+                    <filter name="read" string="Read" domain="[('is_read', '=', True)]"/>
+                    <filter name="unread" string="Unread" domain="[('is_read', '=', False)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_student" string="Student" context="{'group_by': 'student_id'}"/>
+                        <filter name="group_by_type" string="Type" context="{'group_by': 'notification_type'}"/>
+                        <filter name="group_by_priority" string="Priority" context="{'group_by': 'priority'}"/>
+                        <filter name="group_by_read" string="Status" context="{'group_by': 'is_read'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Staff Notification list View -->
+        <record id="view_notification_staff_list" model="ir.ui.view">
+            <field name="name">student_management.notification_staff.list</field>
+            <field name="model">student_management.notification_staff</field>
+            <field name="arch" type="xml">
+                <list string="Staff Notifications" default_order="create_date desc">
+                    <field name="staff_id"/>
+                    <field name="title"/>
+                    <field name="notification_type"/>
+                    <field name="priority"/>
+                    <field name="is_read" widget="boolean_toggle"/>
+                    <field name="create_date"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Staff Notification Form View -->
+        <record id="view_notification_staff_form" model="ir.ui.view">
+            <field name="name">student_management.notification_staff.form</field>
+            <field name="model">student_management.notification_staff</field>
+            <field name="arch" type="xml">
+                <form string="Staff Notification">
+                    <header>
+                        <button name="action_mark_as_read" type="object" string="Mark as Read" 
+                                class="btn-primary" invisible="[('is_read', '=', True)]"/>
+                        <button name="action_mark_as_unread" type="object" string="Mark as Unread" 
+                                class="btn-secondary" invisible="[('is_read', '=', False)]"/>
+                        <field name="is_read" widget="statusbar" statusbar_visible="False,True"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="title" placeholder="Notification Title" required="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="staff_id" required="1" options="{'no_create': True}"/>
+                                <field name="notification_type"/>
+                                <field name="priority"/>
+                            </group>
+                            <group>
+                                <field name="is_read"/>
+                                <field name="create_date" readonly="1"/>
+                                <field name="write_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="message" placeholder="Notification Message" required="1"/>
+                        </group>
+                    </sheet>
+                    <chatter reload_on_follower="True"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Staff Notification Search View -->
+        <record id="view_notification_staff_search" model="ir.ui.view">
+            <field name="name">student_management.notification_staff.search</field>
+            <field name="model">student_management.notification_staff</field>
+            <field name="arch" type="xml">
+                <search string="Search Staff Notifications">
+                    <field name="staff_id" string="Staff"/>
+                    <field name="title" string="Title" filter_domain="[('title', 'ilike', self)]"/>
+                    <field name="notification_type" string="Type"/>
+                    <field name="priority" string="Priority"/>
+                    <separator/>
+                    <filter name="read" string="Read" domain="[('is_read', '=', True)]"/>
+                    <filter name="unread" string="Unread" domain="[('is_read', '=', False)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_staff" string="Staff" context="{'group_by': 'staff_id'}"/>
+                        <filter name="group_by_type" string="Type" context="{'group_by': 'notification_type'}"/>
+                        <filter name="group_by_priority" string="Priority" context="{'group_by': 'priority'}"/>
+                        <filter name="group_by_read" string="Status" context="{'group_by': 'is_read'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Actions -->
+        <record id="action_notification_student" model="ir.actions.act_window">
+            <field name="name">Student Notifications</field>
+            <field name="res_model">student_management.notification_student</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_unread': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No student notifications yet!
+                </p>
+                <p>
+                    Send important announcements and messages to students.
+                    Students can view their notifications through their portal.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_notification_staff" model="ir.actions.act_window">
+            <field name="name">Staff Notifications</field>
+            <field name="res_model">student_management.notification_staff</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_unread': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No staff notifications yet!
+                </p>
+                <p>
+                    Send important announcements and messages to staff members.
+                    Staff can view their notifications through their portal.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
+
+
+

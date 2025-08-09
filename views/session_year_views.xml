@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Session Year list View -->
+        <record id="view_session_year_list" model="ir.ui.view">
+            <field name="name">student_management.session_year.list</field>
+            <field name="model">student_management.session_year</field>
+            <field name="type">qweb</field>
+            <field name="arch" type="xml">
+                <list string="Session Years" default_order="session_start_year desc">
+                    <field name="session_start_year" widget="date"/>
+                    <field name="session_end_year" widget="date"/>
+                    <field name="display_name"/>
+                    <field name="active" widget="boolean_toggle"/>
+                    <field name="student_count"/>
+                    <field name="create_date"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Session Year Form View -->
+        <record id="view_session_year_form" model="ir.ui.view">
+            <field name="name">student_management.session_year.form</field>
+            <field name="model">student_management.session_year</field>
+            <field name="arch" type="xml">
+                <form string="Session Year">
+                    <header>
+                        <field name="active"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="session_start_year" required="1" widget="date"/>
+                                <field name="session_end_year" required="1" widget="date"/>
+                                <field name="active"/>
+                            </group>
+                            <group>
+                                <field name="student_count" readonly="1"/>
+                                <field name="create_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Students" name="students">
+                                <field name="student_ids" readonly="1">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="course_id"/>
+                                        <field name="gender"/>
+                                        <field name="active"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter reload_on_follower="True"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Session Year Search View -->
+        <record id="view_session_year_search" model="ir.ui.view">
+            <field name="name">student_management.session_year.search</field>
+            <field name="model">student_management.session_year</field>
+            <field name="arch" type="xml">
+                <search string="Search Session Years">
+                    <field name="session_start_year"/>
+                    <field name="session_end_year"/>
+                    <field name="display_name"/>
+                    <separator/>
+                    <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                    <filter name="inactive" string="Inactive" domain="[('active', '=', False)]"/>
+                    <separator/>
+                    <filter name="current_year" string="Current Year" 
+                            domain="[('session_start_year', '&lt;=', context_today().year), ('session_end_year', '&gt;=', context_today().year)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_start_year" string="Start Year" context="{'group_by': 'session_start_year'}"/>
+                        <filter name="group_by_active" string="Status" context="{'group_by': 'active'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Session Year Action -->
+        <record id="action_session_year" model="ir.actions.act_window">
+            <field name="name">Session Years</field>
+            <field name="res_model">student_management.session_year</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first session year!
+                </p>
+                <p>
+                    Session years define the academic periods for your institution.
+                    Students are enrolled for specific session years.
+                </p>
+            </field>
+        </record>
+        <menuitem id="menu_session_year"
+                  name="Session Years"
+                  parent="menu_academic_management"
+                  action="action_session_year"
+                  sequence="10"/>
+    </data>
+</odoo>
+
+
+

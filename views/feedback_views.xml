@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Student Feedback list View -->
+        <record id="view_feedback_student_list" model="ir.ui.view">
+            <field name="name">student_management.feedback_student.list</field>
+            <field name="model">student_management.feedback_student</field>
+            <field name="arch" type="xml">
+                <list string="Student Feedback" default_order="create_date desc">
+                    <field name="student_id"/>
+                    <field name="category"/>
+                    <field name="priority"/>
+                    <field name="is_replied" widget="boolean_toggle"/>
+                    <field name="create_date"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Student Feedback Form View -->
+        <record id="view_feedback_student_form" model="ir.ui.view">
+            <field name="name">student_management.feedback_student.form</field>
+            <field name="model">student_management.feedback_student</field>
+            <field name="arch" type="xml">
+                <form string="Student Feedback">
+                    <header>
+                        <button name="mark_as_replied" type="object" string="Mark as Replied" 
+                                class="btn-primary" invisible="[('is_replied', '=', True)]"
+                                groups="group_student_management_admin"/>
+                        <button name="mark_as_replied" type="object" string="Mark as Unreplied" 
+                                class="btn-secondary" invisible="[('is_replied', '=', False)]"
+                                groups="group_student_management_admin"/>
+                        <field name="is_replied" statusbar_visible="False,True"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="student_id" required="1" options="{'no_create': True}"/>
+                                <field name="category"/>
+                                <field name="priority"/>
+                            </group>
+                            <group>
+                                <field name="is_replied"/>
+                                <field name="replied_by" readonly="1"/>
+                                <field name="reply_date" readonly="1"/>
+                                <field name="create_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="feedback" placeholder="Enter feedback message" required="1"/>
+                        </group>
+                        <group string="Admin Reply" invisible="[('admin_reply', '=', False)]">
+                            <field name="feedback_reply"/>
+                        </group>
+                    </sheet>
+                    <chatter reload_on_follower="True"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Student Feedback Search View -->
+        <record id="view_feedback_student_search" model="ir.ui.view">
+            <field name="name">student_management.feedback_student.search</field>
+            <field name="model">student_management.feedback_student</field>
+            <field name="arch" type="xml">
+                <search string="Search Student Feedback">
+                    <field name="student_id" string="Student"/>
+                    <field name="category" string="Category"/>
+                    <field name="priority" string="Priority"/>
+                    <separator/>
+                    <filter name="replied" string="Replied" domain="[('is_replied', '=', True)]"/>
+                    <filter name="unreplied" string="Unreplied" domain="[('is_replied', '=', False)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_student" string="Student" context="{'group_by': 'student_id'}"/>
+                        <filter name="group_by_category" string="Category" context="{'group_by': 'category'}"/>
+                        <filter name="group_by_priority" string="Priority" context="{'group_by': 'priority'}"/>
+                        <filter name="group_by_replied" string="Status" context="{'group_by': 'is_replied'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Staff Feedback list View -->
+        <record id="view_feedback_staff_list" model="ir.ui.view">
+            <field name="name">student_management.feedback_staff.list</field>
+            <field name="model">student_management.feedback_staff</field>
+            <field name="arch" type="xml">
+                <list string="Staff Feedback" default_order="create_date desc">
+                    <field name="staff_id"/>
+                    <field name="category"/>
+                    <field name="priority"/>
+                    <field name="is_replied" widget="boolean_toggle"/>
+                    <field name="create_date"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Staff Feedback Form View -->
+        <record id="view_feedback_staff_form" model="ir.ui.view">
+            <field name="name">student_management.feedback_staff.form</field>
+            <field name="model">student_management.feedback_staff</field>
+            <field name="arch" type="xml">
+                <form string="Staff Feedback">
+                    <header>
+                        <button name="action_reply" type="object" string="Mark as Replied" 
+                                class="btn-primary" invisible="[('is_replied', '=', True)]"
+                                groups="group_student_management_admin"/>
+                        <button name="mark_as_replied" type="object" string="Mark as Unreplied" 
+                                class="btn-secondary" invisible="[('is_replied', '=', False)]"
+                                groups="group_student_management_admin"/>
+                        <field name="is_replied" statusbar_visible="False,True"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="staff_id" required="1" options="{'no_create': True}"/>
+                                <field name="category"/>
+                                <field name="priority"/>
+                            </group>
+                            <group>
+                                <field name="is_replied"/>
+                                <field name="replied_by" readonly="1"/>
+                                <field name="reply_date" readonly="1"/>
+                                <field name="create_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="feedback" placeholder="Enter feedback message" required="1"/>
+                        </group>
+                        <group string="Admin Reply" invisible="[('admin_reply', '=', False)]">
+                            <field name="feedback_reply"/>
+                        </group>
+                    </sheet>
+                    <chatter reload_on_follower="True"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Staff Feedback Search View -->
+        <record id="view_feedback_staff_search" model="ir.ui.view">
+            <field name="name">student_management.feedback_staff.search</field>
+            <field name="model">student_management.feedback_staff</field>
+            <field name="arch" type="xml">
+                <search string="Search Staff Feedback">
+                    <field name="staff_id" string="Staff"/>
+                    <field name="category" string="Category"/>
+                    <field name="priority" string="Priority"/>
+                    <separator/>
+                    <filter name="replied" string="Replied" domain="[('is_replied', '=', True)]"/>
+                    <filter name="unreplied" string="Unreplied" domain="[('is_replied', '=', False)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_staff" string="Staff" context="{'group_by': 'staff_id'}"/>
+                        <filter name="group_by_category" string="Category" context="{'group_by': 'category'}"/>
+                        <filter name="group_by_priority" string="Priority" context="{'group_by': 'priority'}"/>
+                        <filter name="group_by_replied" string="Status" context="{'group_by': 'is_replied'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Actions -->
+        <record id="action_feedback_student" model="ir.actions.act_window">
+            <field name="name">Student Feedback</field>
+            <field name="res_model">student_management.feedback_student</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_unreplied': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No student feedback yet!
+                </p>
+                <p>
+                    Students can submit feedback or suggestions through their portal.
+                    Administrators can review and reply to these feedback entries.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_feedback_staff" model="ir.actions.act_window">
+            <field name="name">Staff Feedback</field>
+            <field name="res_model">student_management.feedback_staff</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_unreplied': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No staff feedback yet!
+                </p>
+                <p>
+                    Staff members can submit feedback or suggestions.
+                    Administrators can review and reply to these feedback entries.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
+

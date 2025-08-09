@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action for Attendance Reports -->
+    <record id="action_attendance_report" model="ir.actions.act_window">
+        <field name="name">Attendance Reports</field>
+        <field name="res_model">student_management.attendance_report</field>
+        <field name="view_mode">list,form,graph,pivot</field>
+        <field name="context">{'search_default_group_by_student': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a new attendance report
+            </p>
+        </field>
+    </record>
+
+    <!-- list View -->
+    <record id="view_attendance_report_list" model="ir.ui.view">
+        <field name="name">attendance.report.list</field>
+        <field name="model">student_management.attendance_report</field>
+        <field name="arch" type="xml">
+            <list string="Attendance Reports" decoration-success="status==True" decoration-danger="status==False">
+                <field name="student_id" widget="many2one_avatar"/>
+                <field name="attendance_id"/>
+                <field name="subject_id"/>
+                <field name="course_id"/>
+                <field name="session_year_id"/>
+                <field name="attendance_date"/>
+                <field name="status" widget="boolean_toggle"/>
+                <field name="total_attendance"/>
+                <field name="attendance_percentage" widget="progressbar" options="{'max_value': 100}"/>
+                <field name="last_updated"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_attendance_report_form" model="ir.ui.view">
+        <field name="name">attendance.report.form</field>
+        <field name="model">student_management.attendance_report</field>
+        <field name="arch" type="xml">
+            <form string="Attendance Report">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="student_id" widget="many2one_avatar"/>
+                            <field name="course_id"/>
+                            <field name="subject_id"/>
+                            <field name="session_year_id"/>
+                        </group>
+                        <group>
+                            <field name="attendance_id"/>
+                            <field name="attendance_date"/>
+                            <field name="status" widget="boolean_toggle"/>
+                            <field name="last_updated"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Statistics">
+                            <group>
+                                <field name="total_attendance"/>
+                                <field name="attendance_percentage" widget="progressbar" options="{'max_value': 100}"/>
+                            </group>
+                        </page>
+                        <page string="Related Attendances">
+                            <field name="attendance_ids" mode="list">
+                                <list>
+                                    <!-- <field name="name"/> -->
+                                    <field name="attendance_date"/>
+                                    <field name="subject_id"/>
+                                    <field name="session_year_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_attendance_report_pivot" model="ir.ui.view">
+        <field name="name">attendance.report.pivot</field>
+        <field name="model">student_management.attendance_report</field>
+        <field name="arch" type="xml">
+            <pivot string="Attendance Analysis">
+                <field name="student_id" type="row"/>
+                <field name="subject_id" type="col"/>
+                <field name="attendance_date" type="col" interval="month"/>
+                <field name="status" type="measure"/>
+                <field name="attendance_percentage" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_attendance_report_graph" model="ir.ui.view">
+        <field name="name">attendance.report.graph</field>
+        <field name="model">student_management.attendance_report</field>
+        <field name="arch" type="xml">
+            <graph string="Attendance Statistics">
+                <field name="student_id" type="row"/>
+                <field name="subject_id" type="col"/>
+                <field name="status" type="measure"/>
+                <field name="attendance_percentage" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_attendance_report_search" model="ir.ui.view">
+        <field name="name">attendance.report.search</field>
+        <field name="model">student_management.attendance_report</field>
+        <field name="arch" type="xml">
+            <search string="Search Attendance Reports">
+                <field name="student_id"/>
+                <field name="subject_id"/>
+                <field name="course_id"/>
+                <field name="session_year_id"/>
+                <field name="attendance_date" filter_domain="[('attendance_date', '=', self)]"/>
+                <filter string="Present" name="present" domain="[('status','=',True)]"/>
+                <filter string="Absent" name="absent" domain="[('status','=',False)]"/>
+                <filter string="This Month" name="this_month" domain="[('attendance_date','>=', (context_today().replace(day=1))), ('attendance_date','&lt;=', context_today())]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Student" name="group_by_student" context="{'group_by':'student_id'}"/>
+                    <filter string="Subject" name="group_by_subject" context="{'group_by':'subject_id'}"/>
+                    <filter string="Course" name="group_by_course" context="{'group_by':'course_id'}"/>
+                    <filter string="Session Year" name="group_by_session" context="{'group_by':'session_year_id'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by':'attendance_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <menuitem id="menu_attendance_report"
+                  name="Attendance Reports"
+                  parent="menu_attendance_management"
+                  action="action_attendance_report"
+                  sequence="20"/>
+</odoo>

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Main Menu -->
+        <menuitem id="menu_student_management_main"
+                  name="Student Management"
+                  sequence="10"
+                  web_icon="student_management_django_odoo,static/description/icon.png"/>
+
+        <!-- Admin/HOD Menu -->
+        <menuitem id="menu_student_management_admin"
+                  name="Administration"
+                  parent="menu_student_management_main"
+                  sequence="10"
+                  groups="group_student_management_admin"/>
+
+        <!-- Academic Management -->
+        <menuitem id="menu_academic_management"
+                  name="Academic Management"
+                  parent="menu_student_management_admin"
+                  sequence="10"/>
+
+        <menuitem id="menu_session_year"
+                  name="Session Years"
+                  parent="menu_academic_management"
+                  action="action_session_year"
+                  sequence="10"/>
+
+        <menuitem id="menu_course"
+                  name="Courses"
+                  parent="menu_academic_management"
+                  action="action_course"
+                  sequence="20"/>
+
+        <menuitem id="menu_subject"
+                  name="Subjects"
+                  parent="menu_academic_management"
+                  action="action_subject"
+                  sequence="30"/>
+
+        <!-- User Management -->
+        <menuitem id="menu_user_management"
+                  name="User Management"
+                  parent="menu_student_management_admin"
+                  sequence="20"/>
+
+        <menuitem id="menu_staff"
+                  name="Staff"
+                  parent="menu_user_management"
+                  action="action_staff"
+                  sequence="10"/>
+
+        <menuitem id="menu_student"
+                  name="Students"
+                  parent="menu_user_management"
+                  action="action_student"
+                  sequence="20"/>
+
+        <!-- Attendance Management -->
+        <menuitem id="menu_attendance_management"
+                  name="Attendance Management"
+                  parent="menu_student_management_admin"
+                  sequence="30"/>
+
+        <!-- <menuitem id="menu_attendance"
+                  name="Attendance Records"
+                  parent="menu_attendance_management"
+                  action="action_attendance"
+                  sequence="10"/> -->
+
+        
+
+        <!-- Leave Management -->
+        <menuitem id="menu_leave_management"
+                  name="Leave Management"
+                  parent="menu_student_management_admin"
+                  sequence="40"/>
+
+        <menuitem id="menu_student_leave"
+                  name="Student Leave Requests"
+                  parent="menu_leave_management"
+                  action="action_leave_report_student"
+                  sequence="10"/>
+
+        <menuitem id="menu_staff_leave"
+                  name="Staff Leave Requests"
+                  parent="menu_leave_management"
+                  action="action_leave_report_staff"
+                  sequence="20"/>
+
+        <!-- Results Management -->
+        <menuitem id="menu_results_management"
+                  name="Results Management"
+                  parent="menu_student_management_admin"
+                  sequence="50"/>
+
+        <menuitem id="menu_student_results"
+                  name="Student Results"
+                  parent="menu_results_management"
+                  action="action_student_result"
+                  sequence="10"/>
+
+        <!-- Communication -->
+        <menuitem id="menu_communication"
+                  name="Communication"
+                  parent="menu_student_management_admin"
+                  sequence="60"/>
+
+        <menuitem id="menu_student_notifications"
+                  name="Student Notifications"
+                  parent="menu_communication"
+                  action="action_notification_student"
+                  sequence="10"/>
+
+        <menuitem id="menu_staff_notifications"
+                  name="Staff Notifications"
+                  parent="menu_communication"
+                  action="action_notification_staff"
+                  sequence="20"/>
+
+        <menuitem id="menu_student_feedback"
+                  name="Student Feedback"
+                  parent="menu_communication"
+                  action="action_feedback_student"
+                  sequence="30"/>
+
+        <menuitem id="menu_staff_feedback"
+                  name="Staff Feedback"
+                  parent="menu_communication"
+                  action="action_feedback_staff"
+                  sequence="40"/>
+
+        <!-- Staff Menu -->
+        <menuitem id="menu_student_management_staff"
+                  name="Staff Portal"
+                  parent="menu_student_management_main"
+                  sequence="20"
+                  groups="group_student_management_staff"/>
+
+        <!-- Staff - My Work -->
+        <menuitem id="menu_staff_my_work"
+                  name="My Work"
+                  parent="menu_student_management_staff"
+                  sequence="10"/>
+
+        <menuitem id="menu_staff_my_subjects"
+                  name="My Subjects"
+                  parent="menu_staff_my_work"
+                  action="action_staff_my_subjects"
+                  sequence="10"/>
+
+        <!-- <menuitem id="menu_staff_take_attendance"
+                  name="Take Attendance"
+                  parent="menu_staff_my_work"
+                  action="action_staff_take_attendance"
+                  sequence="20"/> -->
+
+        <!-- <menuitem id="menu_staff_view_attendance"
+                  name="View Attendance"
+                  parent="menu_staff_my_work"
+                  action="action_staff_view_attendance"
+                  sequence="30"/> -->
+
+        <!-- <menuitem id="menu_staff_add_results"
+                  name="Add/Update Results"
+                  parent="menu_staff_my_work"
+                  action="action_staff_add_results"
+                  sequence="40"/> -->
+
+        <!-- Staff - Personal -->
+        <menuitem id="menu_staff_personal"
+                  name="Personal"
+                  parent="menu_student_management_staff"
+                  sequence="20"/>
+
+        <menuitem id="menu_staff_my_profile"
+                  name="My Profile"
+                  parent="menu_staff_personal"
+                  action="action_staff_my_profile"
+                  sequence="10"/>
+
+        <!-- <menuitem id="menu_staff_apply_leave"
+                  name="Apply for Leave"
+                  parent="menu_staff_personal"
+                  action="action_staff_apply_leave"
+                  sequence="20"/> -->
+
+        <!-- <menuitem id="menu_staff_my_leave"
+                  name="My Leave Requests"
+                  parent="menu_staff_personal"
+                  action="action_staff_my_leave"
+                  sequence="30"/> -->
+
+        <!-- <menuitem id="menu_staff_send_feedback"
+                  name="Send Feedback"
+                  parent="menu_staff_personal"
+                  action="action_staff_send_feedback"
+                  sequence="40"/> -->
+
+        <!-- <menuitem id="menu_staff_my_notifications"
+                  name="My Notifications"
+                  parent="menu_staff_personal"
+                  action="action_staff_my_notifications"
+                  sequence="50"/> -->
+
+        <!-- Student Menu -->
+        <menuitem id="menu_student_management_student"
+                  name="Student Portal"
+                  parent="menu_student_management_main"
+                  sequence="30"
+                  groups="group_student_management_student"/>
+
+        <!-- Student - Academic -->
+        <menuitem id="menu_student_academic"
+                  name="Academic"
+                  parent="menu_student_management_student"
+                  sequence="10"/>
+
+        <!-- <menuitem id="menu_student_my_attendance"
+                  name="My Attendance"
+                  parent="menu_student_academic"
+                  action="action_student_my_attendance"
+                  sequence="10"/> -->
+
+        <!-- <menuitem id="menu_student_my_results"
+                  name="My Results"
+                  parent="menu_student_academic"
+                  action="action_student_my_results"
+                  sequence="20"/> -->
+
+        <!-- <menuitem id="menu_student_my_subjects"
+                  name="My Subjects"
+                  parent="menu_student_academic"
+                  action="action_student_my_subjects"
+                  sequence="30"/> -->
+
+        <!-- Student - Personal -->
+        <menuitem id="menu_student_personal"
+                  name="Personal"
+                  parent="menu_student_management_student"
+                  sequence="20"/>
+
+        <!-- <menuitem id="menu_student_my_profile"
+                  name="My Profile"
+                  parent="menu_student_personal"
+                  action="action_student_my_profile"
+                  sequence="10"/> -->
+
+        <!-- <menuitem id="menu_student_apply_leave"
+                  name="Apply for Leave"
+                  parent="menu_student_personal"
+                  action="action_student_apply_leave"
+                  sequence="20"/> -->
+
+        <!-- <menuitem id="menu_student_my_leave"
+                  name="My Leave Requests"
+                  parent="menu_student_personal"
+                  action="action_student_my_leave"
+                  sequence="30"/> -->
+
+        <!-- <menuitem id="menu_student_send_feedback"
+                  name="Send Feedback"
+                  parent="menu_student_personal"
+                  action="action_student_send_feedback"
+                  sequence="40"/> -->
+
+        <!-- <menuitem id="menu_student_my_notifications"
+                  name="My Notifications"
+                  parent="menu_student_personal"
+                  action="action_student_my_notifications"
+                  sequence="50"/> -->
+
+    </data>
+</odoo>
+
+<!-- This XML file defines the menu structure for the Student Management application in Odoo.
+     It organizes the menus into main categories such as Administration, Academic Management, User Management,
+     Attendance Management, Leave Management, Results Management, Communication, and separate portals for Staff and Students.
+     Each menu item is linked to specific actions that are defined elsewhere in the application. -->

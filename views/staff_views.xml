@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Staff list View -->
+        <record id="view_staff_list" model="ir.ui.view">
+            <field name="name">student_management.staff.list</field>
+            <field name="model">student_management.staff</field>
+            <field name="arch" type="xml">
+                <list string="Staff" default_order="name">
+                    <field name="name"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="gender"/>
+                    <field name="active" widget="boolean_toggle"/>
+                    <field name="subject_count"/>
+                    <field name="create_date"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Staff Form View -->
+        <record id="view_staff_form" model="ir.ui.view">
+            <field name="name">student_management.staff.form</field>
+            <field name="model">student_management.staff</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Staff">
+                    <header>
+                        <button name="action_create_user" type="object" string="Create User Account"
+                                class="btn-primary" invisible="[('user_id', '!=', False)]"/>
+                        <button name="action_activate" type="object" string="Activate"
+                                class="btn-primary" invisible="[('active', '=', True)]"/>
+                        <button name="action_deactivate" type="object" string="Deactivate"
+                                class="btn-secondary" invisible="[('active', '=', False)]"/>
+                        <field name="active" statusbar_visible="active"/>
+                    </header>
+                    <sheet>
+                        <div class="alert alert-warning" invisible="[('phone','!=',False),('gender','!=',False),('address','!=',False)]">
+                            <strong>Warning!</strong> Please complete your profile information.
+                        </div>
+                        <field name="profile_pic" widget="image" class="oe_avatar" options="{'preview_image': 'profile_pic', 'size': [90, 90]}"/>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <group>
+                                    <field name="user_id" options="{'no_create': True}" readonly="1"/>
+                                    <field name="email" readonly="1"/>
+                                    <field name="phone" required="1" placeholder="Enter phone number"/>
+                                    <field name="gender" required="1"/>
+                                </group>
+                                <group>
+                                    <field name="active"/>
+                                    <field name="subject_count" readonly="1"/>
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="write_date" readonly="1"/>
+                                </group>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="address" placeholder="Enter your full address" required="1"/>
+                            <field name="employee_id" placeholder="Enter employee ID"/>
+                            <field name="qualification" placeholder="Enter your qualification"/>
+                        </group>
+                        <notebook>
+                            <page string="Subjects" name="subjects">
+                                <field name="subject_ids" readonly="1">
+                                    <list>
+                                        <field name="subject_name"/>
+                                        <field name="course_id"/>
+                                        <field name="student_count"/>
+                                        <field name="active"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Leave Requests" name="leave_requests">
+                                <field name="leave_request_ids" readonly="1">
+                                    <list>
+                                        <field name="leave_date"/>
+                                        <field name="leave_end_date"/>
+                                        <field name="leave_duration"/>
+                                        <field name="leave_status"/>
+                                        <field name="create_date"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Feedback" name="feedback">
+                                <field name="feedback_ids" readonly="1">
+                                    <list>
+                                        <field name="category"/>
+                                        <field name="priority"/>
+                                        <field name="is_replied"/>
+                                        <field name="create_date"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Notifications" name="notifications">
+                                <field name="notification_ids" readonly="1">
+                                    <list>
+                                        <field name="title"/>
+                                        <field name="notification_type"/>
+                                        <field name="priority"/>
+                                        <field name="is_read"/>
+                                        <field name="create_date"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter reload_on_follower="True"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Staff Kanban View -->
+        <record id="view_staff_kanban" model="ir.ui.view">
+            <field name="name">student_management.staff.kanban</field>
+            <field name="model">student_management.staff</field>
+            <field name="type">kanban</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="gender"/>
+                    <field name="active"/>
+                    <field name="subject_count"/>
+                    <field name="profile_pic"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card oe_kanban_global_click">
+                                <div class="o_kanban_record_top mb16">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="o_kanban_record_subtitle">
+                                            <field name="email"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <i class="fa fa-phone" title="Phone"/> <field name="phone"/>
+                                            </div>
+                                            <div class="col-6">
+                                                <i class="fa fa-book" title="Subjects"/> <field name="subject_count"/> Subjects
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <i class="fa fa-venus-mars" title="Gender"/> <field name="gender"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="active" widget="boolean_toggle"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <img t-att-src="kanban_image('student_management.staff', 'profile_pic', record.id.raw_value)"
+                                             class="oe_kanban_avatar" width="24" height="24"
+                                             t-att-alt="record.name + ' profile picture'"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Staff Search View -->
+        <record id="view_staff_search" model="ir.ui.view">
+            <field name="name">student_management.staff.search</field>
+            <field name="model">student_management.staff</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Search Staff">
+                    <field name="name" string="Name" filter_domain="[('name', 'ilike', self)]"/>
+                    <field name="email" string="Email"/>
+                    <field name="phone" string="Phone"/>
+                    <separator/>
+                    <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                    <filter name="inactive" string="Inactive" domain="[('active', '=', False)]"/>
+                    <separator/>
+                    <filter name="male" string="Male" domain="[('gender', '=', 'male')]"/>
+                    <filter name="female" string="Female" domain="[('gender', '=', 'female')]"/>
+                    <separator/>
+                    <filter name="has_subjects" string="Has Subjects" domain="[('subject_count', '>', 0)]"/>
+                    <filter name="no_subjects" string="No Subjects" domain="[('subject_count', '=', 0)]"/>
+                    <separator/>
+                    <filter name="has_user" string="Has User Account" domain="[('user_id', '!=', False)]"/>
+                    <filter name="no_user" string="No User Account" domain="[('user_id', '=', False)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_gender" string="Gender" context="{'group_by': 'gender'}"/>
+                        <filter name="group_by_active" string="Status" context="{'group_by': 'active'}"/>
+                        <filter name="group_by_create_date" string="Creation Date" context="{'group_by': 'create_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Staff Action -->
+        <record id="action_staff" model="ir.actions.act_window">
+            <field name="name">Staff</field>
+            <field name="res_model">student_management.staff</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add your first staff member!
+                </p>
+                <p>
+                    Staff members are the teachers and administrators in your institution.
+                    They can be assigned to subjects and have user accounts for system access.
+                </p>
+            </field>
+        </record>
+        <menuitem id="menu_staff"
+                   name="Staff"
+                   parent="menu_user_management"
+                   action="action_staff"
+                   sequence="10"/>
+        
+        <!-- Staff My Profile Action -->
+        <record id="action_staff_my_profile" model="ir.actions.act_window">
+            <field name="name">My Profile</field>
+            <field name="res_model">student_management.staff</field>
+            <field name="view_mode">form</field>
+            <field name="context">{
+                'form_view_initial_mode': 'edit',
+                'default_user_id': uid,
+                'search_default_my_profile': 1,
+                'allowed_company_ids': [1],
+                'create': False,
+                'edit': True,
+                'delete': False,
+                'bypass_security': True,
+                'bypass_user_check': True
+            }</field>
+            <field name="domain">[('user_id', '=', uid)]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No profile found for your user account.
+                </p>
+                <p>
+                    Please contact administrator to create your staff profile.
+                </p>
+            </field>
+        </record>
+        
+        <!-- Staff My Subjects Action -->
+        <record id="action_staff_my_subjects" model="ir.actions.act_window">
+            <field name="name">My Subjects</field>
+            <field name="res_model">student_management.subject</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('staff_id.user_id', '=', uid)]</field>
+            <field name="help" type="html">
+                <p>View the subjects assigned to you</p>
+            </field>
+        </record>
+        
+        
+    </data>
+</odoo>

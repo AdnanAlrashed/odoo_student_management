@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Student Leave Request list View -->
+        <record id="view_leave_report_student_list" model="ir.ui.view">
+            <field name="name">student_management.leave_report_student.list</field>
+            <field name="model">student_management.leave_report_student</field>
+            <field name="arch" type="xml">
+                <list string="Student Leave Requests" default_order="leave_date desc">
+                    <field name="student_id"/>
+                    <field name="leave_date"/>
+                    <field name="leave_end_date"/>
+                    <field name="leave_duration"/>
+                    <field name="leave_status" decoration-info="leave_status == 'pending'" 
+                           decoration-success="leave_status == 'approved'" 
+                           decoration-danger="leave_status == 'rejected'"/>
+                    <field name="approved_by"/>
+                    <field name="create_date"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Student Leave Request Form View -->
+        <record id="view_leave_report_student_form" model="ir.ui.view">
+            <field name="name">student_management.leave_report_student.form</field>
+            <field name="model">student_management.leave_report_student</field>
+            <field name="arch" type="xml">
+                <form string="Student Leave Request">
+                    <header>
+                        <button name="action_approve" type="object" string="Approve" 
+                                class="btn-success" invisible="[('leave_status', '!=', 'pending')]"
+                                groups="group_student_management_admin"/>
+                        <button name="action_reject" type="object" string="Reject" 
+                                class="btn-danger" invisible="[('leave_status', '!=', 'pending')]"
+                                groups="group_student_management_admin"/>
+                        <button name="action_reset_to_pending" type="object" string="Reset to Pending" 
+                                class="btn-secondary" invisible="[('leave_status', '=', 'pending')]"
+                                groups="group_student_management_admin"/>
+                        <field name="leave_status" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="student_id" required="1" options="{'no_create': True}"/>
+                                <field name="leave_date" required="1"/>
+                                <field name="leave_end_date"/>
+                                <field name="leave_duration" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="leave_status"/>
+                                <field name="approved_by" readonly="1"/>
+                                <field name="approval_date" readonly="1"/>
+                                <field name="create_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="leave_message" placeholder="Reason for leave request" required="1"/>
+                        </group>
+                        <group string="Admin Reply" invisible="[('admin_reply', '=', False)]">
+                            <field name="admin_reply" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <chatter reload_on_follower="True"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Student Leave Request Search View -->
+        <record id="view_leave_report_student_search" model="ir.ui.view">
+            <field name="name">student_management.leave_report_student.search</field>
+            <field name="model">student_management.leave_report_student</field>
+            <field name="arch" type="xml">
+                <search string="Search Student Leave Requests">
+                    <field name="student_id" string="Student"/>
+                    <field name="leave_date" string="Leave Date"/>
+                    <separator/>
+                    <filter name="pending" string="Pending" domain="[('leave_status', '=', 'pending')]"/>
+                    <filter name="approved" string="Approved" domain="[('leave_status', '=', 'approved')]"/>
+                    <filter name="rejected" string="Rejected" domain="[('leave_status', '=', 'rejected')]"/>
+                    <separator/>
+                    <filter name="today" string="Today" domain="[('leave_date', '=', context_today())]"/>
+                    <filter name="this_week" string="This Week" 
+                            domain="[('leave_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                     ('leave_date', '&lt;=', (context_today() + datetime.timedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                    <filter name="this_month" string="This Month" 
+                            domain="[('leave_date', '&gt;=', context_today().replace(day=1).strftime('%Y-%m-%d'))]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_student" string="Student" context="{'group_by': 'student_id'}"/>
+                        <filter name="group_by_status" string="Status" context="{'group_by': 'leave_status'}"/>
+                        <filter name="group_by_date" string="Leave Date" context="{'group_by': 'leave_date'}"/>
+                        <filter name="group_by_course" string="Course" context="{'group_by': 'course_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Staff Leave Request list View -->
+        <record id="view_leave_report_staff_list" model="ir.ui.view">
+            <field name="name">student_management.leave_report_staff.list</field>
+            <field name="model">student_management.leave_report_staff</field>
+            <field name="arch" type="xml">
+                <list string="Staff Leave Requests" default_order="leave_date desc">
+                    <field name="staff_id"/>
+                    <field name="leave_date"/>
+                    <field name="leave_end_date"/>
+                    <field name="leave_duration"/>
+                    <field name="leave_status" decoration-info="leave_status == 'pending'" 
+                           decoration-success="leave_status == 'approved'" 
+                           decoration-danger="leave_status == 'rejected'"/>
+                    <field name="approved_by"/>
+                    <field name="create_date"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Staff Leave Request Form View -->
+        <record id="view_leave_report_staff_form" model="ir.ui.view">
+            <field name="name">student_management.leave_report_staff.form</field>
+            <field name="model">student_management.leave_report_staff</field>
+            <field name="arch" type="xml">
+                <form string="Staff Leave Request">
+                    <header>
+                        <button name="action_approve" type="object" string="Approve" 
+                                class="btn-success" invisible="[('leave_status', '!=', 'pending')]"
+                                groups="group_student_management_admin"/>
+                        <button name="action_reject" type="object" string="Reject" 
+                                class="btn-danger" invisible="[('leave_status', '!=', 'pending')]"
+                                groups="group_student_management_admin"/>
+                        <button name="action_reset_to_pending" type="object" string="Reset to Pending" 
+                                class="btn-secondary" invisible="[('leave_status', '=', 'pending')]"
+                                groups="group_student_management_admin"/>
+                        <field name="leave_status" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="staff_id" required="1" options="{'no_create': True}"/>
+                                <field name="leave_date" required="1"/>
+                                <field name="leave_end_date"/>
+                                <field name="leave_duration" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="leave_status"/>
+                                <field name="approved_by" readonly="1"/>
+                                <field name="approval_date" readonly="1"/>
+                                <field name="create_date" readonly="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="leave_message" placeholder="Reason for leave request" required="1"/>
+                        </group>
+                        <group string="Admin Reply" invisible="[('admin_reply', '=', False)]">
+                            <field name="admin_reply" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <chatter reload_on_follower="True"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Staff Leave Request Search View -->
+        <record id="view_leave_report_staff_search" model="ir.ui.view">
+            <field name="name">student_management.leave_report_staff.search</field>
+            <field name="model">student_management.leave_report_staff</field>
+            <field name="arch" type="xml">
+                <search string="Search Staff Leave Requests">
+                    <field name="staff_id" string="Staff"/>
+                    <field name="leave_date" string="Leave Date"/>
+                    <separator/>
+                    <filter name="pending" string="Pending" domain="[('leave_status', '=', 'pending')]"/>
+                    <filter name="approved" string="Approved" domain="[('leave_status', '=', 'approved')]"/>
+                    <filter name="rejected" string="Rejected" domain="[('leave_status', '=', 'rejected')]"/>
+                    <separator/>
+                    <filter name="today" string="Today" domain="[('leave_date', '=', context_today())]"/>
+                    <filter name="this_week" string="This Week" 
+                            domain="[('leave_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                     ('leave_date', '&lt;=', (context_today() + datetime.timedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                    <filter name="this_month" string="This Month" 
+                            domain="[('leave_date', '&gt;=', context_today().replace(day=1).strftime('%Y-%m-%d'))]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_staff" string="Staff" context="{'group_by': 'staff_id'}"/>
+                        <filter name="group_by_status" string="Status" context="{'group_by': 'leave_status'}"/>
+                        <filter name="group_by_date" string="Leave Date" context="{'group_by': 'leave_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Actions -->
+        <record id="action_leave_report_student" model="ir.actions.act_window">
+            <field name="name">Student Leave Requests</field>
+            <field name="res_model">student_management.leave_report_student</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_pending': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No student leave requests yet!
+                </p>
+                <p>
+                    Students can submit leave requests through their portal.
+                    Administrators can approve or reject these requests.
+                </p>
+            </field>
+        </record>
+
+        <record id="action_leave_report_staff" model="ir.actions.act_window">
+            <field name="name">Staff Leave Requests</field>
+            <field name="res_model">student_management.leave_report_staff</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{'search_default_pending': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No staff leave requests yet!
+                </p>
+                <p>
+                    Staff members can submit leave requests through their portal.
+                    Administrators can approve or reject these requests.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
+
