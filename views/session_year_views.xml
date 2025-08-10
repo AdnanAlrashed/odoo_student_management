@@ -102,11 +102,11 @@
                 </p>
             </field>
         </record>
-        <menuitem id="menu_session_year"
+        <!-- <menuitem id="menu_session_year"
                   name="Session Years"
                   parent="menu_academic_management"
                   action="action_session_year"
-                  sequence="10"/>
+                  sequence="10"/> -->
     </data>
 </odoo>
 

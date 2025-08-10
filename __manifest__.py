@@ -1,5 +1,6 @@
 {
     'name': 'Student Management System (Django Port)',
+    'icon': '/odoo_student_management/static/img/academy.png',
     'version': '18.0.1.0.1',
     'category': 'Education',
     'summary': 'Complete Student Management System ported from Django to Odoo 18',
@@ -48,7 +49,6 @@
         
         
         # Views
-        'views/menu.xml',
         'views/session_year_views.xml',
         'views/odoo_course_views.xml',
         'views/subject_views.xml',
@@ -60,6 +60,7 @@
         'views/notification_views.xml',
         'views/res_users_views.xml',
         'views/student_result_views.xml',
+        'views/menu.xml',
         'reports/attendance_report.xml'
     ],
     'assets': {

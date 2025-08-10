@@ -177,11 +177,11 @@
             </p>
         </field>
     </record>
-    <menuitem id="menu_course"
+    <!-- <menuitem id="menu_course"
                    name="Courses"
                    parent="menu_academic_management"
                    action="action_course"
-                   sequence="20"/>
+                   sequence="20"/> -->
 </odoo>
 
 

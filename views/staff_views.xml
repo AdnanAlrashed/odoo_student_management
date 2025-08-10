@@ -223,11 +223,11 @@
                 </p>
             </field>
         </record>
-        <menuitem id="menu_staff"
+        <!-- <menuitem id="menu_staff"
                    name="Staff"
                    parent="menu_user_management"
                    action="action_staff"
-                   sequence="10"/>
+                   sequence="10"/> -->
         
         <!-- Staff My Profile Action -->
         <record id="action_staff_my_profile" model="ir.actions.act_window">

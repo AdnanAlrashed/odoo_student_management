@@ -5,7 +5,7 @@
         <menuitem id="menu_student_management_main"
                   name="Student Management"
                   sequence="10"
-                  web_icon="student_management_django_odoo,static/description/icon.png"/>
+                  web_icon="odoo_student_management,static/img/academy.png"/>
 
         <!-- Admin/HOD Menu -->
         <menuitem id="menu_student_management_admin"
