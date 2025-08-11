@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_staff_profile_wizard_form" model="ir.ui.view">
+            <field name="name">student_management.staff.profile.form</field>
+            <field name="model">student_management.staff.profile</field>
+            <field name="arch" type="xml">
+                <form string="Edit My Profile">
+                     <header>
+                        <button name="%(odoo_student_management.action_change_password_wizard)d" 
+                                type="action" 
+                                string="Change Password" 
+                                class="btn-link"/>
+                    </header>
+                    <div class="oe_title">
+                        <h1>Edit Your Personal Information</h1>
+                        <p class="text-muted">
+                            Please keep your information up to date. Changes will be reflected in your staff profile.
+                        </p>
+                    </div>
+                    <group>
+                        <group string="Contact Information">
+                            <field name="phone" placeholder="e.g., +1 555 123 4567"/>
+                            <field name="address" placeholder="Enter your full address"/>
+                        </group>
+                        <group string="Personal Details">
+                            <field name="date_of_birth"/>
+                            <field name="gender"/>
+                        </group>
+                    </group>
+                    <separator string="Professional Details"/>
+                    <group>
+                        <field name="qualification" placeholder="e.g., Bachelor's in Computer Science"/>
+                        <field name="experience_years"/>
+                        <field name="profile_pic" widget="image" class="oe_avatar"/>
+                    </group>
+                    <footer>
+                        <button name="action_save_profile" type="object" string="Save Changes" class="btn-primary" data-hotkey="s"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="j"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

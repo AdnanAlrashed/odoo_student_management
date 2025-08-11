@@ -47,10 +47,11 @@
                         <group>
                             <group>
                                 <group>
-                                    <field name="user_id" options="{'no_create': True}" readonly="1"/>
+                                    <field name="user_id"/>
                                     <field name="email" readonly="1"/>
                                     <field name="phone" required="1" placeholder="Enter phone number"/>
-                                    <field name="gender" required="1"/>
+                                    <field name="gender" required="1" force_save="1"/>
+                                    <field name="date_of_birth" force_save="1"/>
                                 </group>
                                 <group>
                                     <field name="active"/>
@@ -61,7 +62,7 @@
                             </group>
                         </group>
                         <group>
-                            <field name="address" placeholder="Enter your full address" required="1"/>
+                            <field name="address" placeholder="Enter your full address" required="1" force_save="1"/>
                             <field name="employee_id" placeholder="Enter employee ID"/>
                             <field name="qualification" placeholder="Enter your qualification"/>
                         </group>
@@ -228,35 +229,25 @@
                    parent="menu_user_management"
                    action="action_staff"
                    sequence="10"/> -->
-        
-        <!-- Staff My Profile Action -->
-        <record id="action_staff_my_profile" model="ir.actions.act_window">
-            <field name="name">My Profile</field>
-            <field name="res_model">student_management.staff</field>
-            <field name="view_mode">form</field>
-            <field name="context">{
-                'form_view_initial_mode': 'edit',
-                'default_user_id': uid,
-                'search_default_my_profile': 1,
-                'allowed_company_ids': [1],
-                'create': False,
-                'edit': True,
-                'delete': False,
-                'bypass_security': True,
-                'bypass_user_check': True
-            }</field>
-            <field name="domain">[('user_id', '=', uid)]</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    No profile found for your user account.
-                </p>
-                <p>
-                    Please contact administrator to create your staff profile.
-                </p>
-            </field>
-        </record>
-        
-        <!-- Staff My Subjects Action -->
+
+
+    <!-- Server Action and Menu Item remain the same as the last working version -->
+    <!-- ================================================================= -->
+    <!-- SERVER ACTION to call the Python function -->
+    <!-- ================================================================= -->
+    <record id="action_server_open_my_profile" model="ir.actions.server">
+    <field name="name">Open Staff Profile</field>
+    <field name="model_id" ref="model_student_management_staff"/>
+    <field name="binding_model_id" ref="model_student_management_staff"/>
+    <field name="state">code</field>
+    <field name="code">
+staff_record = env['student_management.staff'].search([('user_id', '=', user.id)], limit=1)
+if staff_record:
+    action = staff_record.action_open_my_profile_wizard()
+    </field>
+</record>
+
+            <!-- Staff My Subjects Action -->
         <record id="action_staff_my_subjects" model="ir.actions.act_window">
             <field name="name">My Subjects</field>
             <field name="res_model">student_management.subject</field>

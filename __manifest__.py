@@ -60,6 +60,8 @@
         'views/notification_views.xml',
         'views/res_users_views.xml',
         'views/student_result_views.xml',
+        'views/change_password_views.xml',
+        'views/staff_profile_views.xml',
         'views/menu.xml',
         'reports/attendance_report.xml'
     ],

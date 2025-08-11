@@ -83,17 +83,16 @@
             <field name="perm_unlink" eval="True"/>
         </record>
 
-        <record id="staff_rule_staff" model="ir.rule">
-            <field name="name">Staff: Staff Access</field>
-            <field name="model_id" ref="model_student_management_staff"/>
-            <field name="domain_force">['|', ('user_id', '=', user.id), ('id', '=', user.staff_id.id)]</field>
-            <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
-            <field name="active" eval="True"/>
-        </record>
+    <record id="staff_rule_staff" model="ir.rule">
+        <field name="name">Staff: Edit Own Profile</field>
+        <field name="model_id" ref="model_student_management_staff"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_student_management_staff'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
 
         <!-- Additional rule for staff to access their own profile data -->
         <record id="staff_profile_rule_staff" model="ir.rule">

@@ -174,10 +174,10 @@
                   sequence="20"/>
 
         <menuitem id="menu_staff_my_profile"
-                  name="My Profile"
-                  parent="menu_staff_personal"
-                  action="action_staff_my_profile"
-                  sequence="10"/>
+              name="My Profile"
+              parent="menu_staff_personal"
+              sequence="10"
+              action="action_server_open_my_profile"/>
 
         <!-- <menuitem id="menu_staff_apply_leave"
                   name="Apply for Leave"
