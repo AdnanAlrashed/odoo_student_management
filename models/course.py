@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
@@ -177,5 +177,20 @@ class Course(models.Model):
             result.append((record.id, name))
         return result
 
+     # دالة جديدة لفتح المواد الخاصة بالطالب في دورة معينة
+    
+    
+    def action_view_my_subjects_in_course(self):
+        self.ensure_one()
+        # هذا الإجراء سيفتح عرض شجري للمواد
+        # وسيتم تصفيته ليظهر فقط المواد المرتبطة بدورة الطالب
+        return {
+            'name': _('Subjects in %s') % (self.course_id.course_name),
+            'type': 'ir.actions.act_window',
+            'res_model': 'student_management.subject',
+            'view_mode': 'list,form', # يمكن استخدام kanban أيضًا
+            'domain': [('course_id', '=', self.course_id.id)],
+            'target': 'current', # يفتح في نفس النافذة
+        }
 
-
+    

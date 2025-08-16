@@ -27,6 +27,21 @@
                     <field name="active" statusbar_visible="active,archived"/>
                 </header>
                 <sheet>
+
+                    <!-- ======================================================= -->
+                <!--           ADD SMART BUTTONS FOR STUDENTS              -->
+                <!-- ======================================================= -->
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_subjects"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-book"
+                        string="My Subjects"
+                        groups="group_student_management_student">
+                        <!-- لا نحتاج لعرض عدد المواد هنا للطالب -->
+                    </button>
+                </div>
+
                     <div class="oe_title">
                         <h1>
                             <field name="course_name" placeholder="Course Name" required="1"/>

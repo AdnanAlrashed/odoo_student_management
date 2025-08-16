@@ -54,7 +54,8 @@
                   name="Students"
                   parent="menu_user_management"
                   action="action_student"
-                  sequence="20"/>
+                  sequence="20"
+                  groups="group_student_management_student"/>
 
         <!-- Attendance Management -->
         <menuitem id="menu_attendance_management"
@@ -228,11 +229,17 @@
                   action="action_student_my_results"
                   sequence="20"/> -->
 
-        <!-- <menuitem id="menu_student_my_subjects"
-                  name="My Subjects"
+        <!-- <menuitem id="menu_student_my_courses"
+            name="My Courses"
+            parent="menu_student_academic"
+            action="action_server_show_my_courses"
+            sequence="10"/> -->
+
+        <menuitem id="menu_student_my_courses"
+                  name="My Courses"
                   parent="menu_student_academic"
-                  action="action_student_my_subjects"
-                  sequence="30"/> -->
+                  action="action_server_show_my_courses"
+                  sequence="30"/>
 
         <!-- Student - Personal -->
         <menuitem id="menu_student_personal"
@@ -240,11 +247,11 @@
                   parent="menu_student_management_student"
                   sequence="20"/>
 
-        <!-- <menuitem id="menu_student_my_profile"
+        <menuitem id="menu_student_my_profile"
                   name="My Profile"
                   parent="menu_student_personal"
-                  action="action_student_my_profile"
-                  sequence="10"/> -->
+                  action="action_server_open_student_profile"
+                  sequence="10"/>
 
         <!-- <menuitem id="menu_student_apply_leave"
                   name="Apply for Leave"

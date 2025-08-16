@@ -62,6 +62,7 @@
         'views/student_result_views.xml',
         'views/change_password_views.xml',
         'views/staff_profile_views.xml',
+        'views/profile/student_profile_views.xml',
         'views/menu.xml',
         'reports/attendance_report.xml'
     ],

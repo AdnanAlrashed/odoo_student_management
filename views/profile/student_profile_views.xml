@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_student_profile_wizard_form" model="ir.ui.view">
+            <field name="name">student_management.student.profile.form</field>
+            <field name="model">student_management.student.profile</field>
+            <field name="arch" type="xml">
+                <form string="Edit My Profile">
+                    <header>
+                        <button name="%(odoo_student_management.action_change_password_wizard)d" 
+                            type="action" 
+                            string="Change Password" 
+                            class="btn-link"/>
+
+                    </header>
+                    <div class="oe_title">
+                        <h1>Edit Your Personal Information</h1>
+                    </div>
+                    <group>
+                        <group string="Contact Information">
+                            <field name="phone" placeholder="e.g., +1 555 123 4567"/>
+                            <field name="address" placeholder="Enter your full address"/>
+                        </group>
+                        <group string="Personal Details">
+                            <field name="date_of_birth"/>
+                            <field name="profile_pic" widget="image" class="oe_avatar"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_save_student_profile" type="object" string="Save Changes" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

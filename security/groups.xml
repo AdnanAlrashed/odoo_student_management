@@ -309,5 +309,44 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
+        <!-- <record id="course_rule_student" model="ir.rule">
+            <field name="name">Course: Student Access</field>
+            <field name="model_id" ref="model_student_management_course"/>
+            <field name="domain_force">[('student_ids.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_student')),(4, ref('group_student_management_admin'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record> -->
+
+        <!-- <record id="staff_rule_student" model="ir.rule">
+            <field name="name">Staff: Student Access</field>
+            <field name="model_id" ref="model_student_management_staff"/>
+            <field name="domain_force">[
+                ('subject_ids.student_ids.user_id', '=', user.id)
+            ]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_student'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record> -->
+
+        <!-- <record id="subject_rule_student" model="ir.rule">
+            <field name="name">Subject: Student Access</field>
+            <field name="model_id" ref="model_student_management_subject"/>
+            <field name="domain_force">[
+                '|',
+                ('student_ids.user_id', '=', user.id),
+                ('course_id.student_ids.user_id', '=', user.id)
+            ]</field>
+            <field name="groups" eval="[(4, ref('group_student_management_student'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record> -->
+
     </data>
 </odoo>

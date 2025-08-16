@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
@@ -145,7 +145,8 @@ class Student(models.Model):
         'student_management.subject',
         'course_id',
         string='Subjects',
-        compute='_compute_subject_ids'
+        compute='_compute_subject_ids',
+        sorte = True
     )
 
     # Computed fields
@@ -369,3 +370,37 @@ class Student(models.Model):
         self.ensure_one()
         self.write({'active': False})
         return True
+
+# student Profile
+    def action_open_student_profile_wizard(self):
+        """
+        Creates and opens the student profile editing wizard.
+        """
+        self.ensure_one()
+        wizard = self.env['student_management.student.profile'].create({
+            'student_id_ref': self.id,
+            'phone': self.phone,
+            'address': self.address,
+            'date_of_birth': self.date_of_birth,
+            'profile_pic': self.profile_pic,
+        })
+
+        return {
+            'name': 'Edit My Profile',
+            'type': 'ir.actions.act_window',
+            'res_model': 'student_management.student.profile',
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        students = super().create(vals_list)
+        for student in students:
+            if student.course_id:
+                subjects = self.env['student_management.subject'].search([
+                    ('course_id', '=', student.course_id.id)
+                ])
+                student.write({'subject_ids': [(6, 0, subjects.ids)]})
+        return students

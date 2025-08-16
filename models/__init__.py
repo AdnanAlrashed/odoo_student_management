@@ -11,3 +11,4 @@ from . import student_result
 from . import res_users
 from . import staff_profile
 from . import change_password
+from . import student_profile
