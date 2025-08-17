@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- قائمة جانبية ديناميكية حسب المجموعة -->
     <template id="sidebar_menu" name="Sidebar Menu">
         <!-- قائمة المدير -->
         <t t-if="request.env.user.has_group('odoo_student_management.group_student_management_admin')">
@@ -32,8 +33,25 @@
             <a href="/student_management/student/attendance/view" class="list-group-item list-group-item-action">View Attendance</a>
             <a href="/student_management/student/results/view" class="list-group-item list-group-item-action">View Results</a>
             <a href="/student_management/student/leave/apply" class="list-group-item list-group-item-action">Apply for Leave</a>
-            <a href="/student_management/student/feedback" class="list_group-item list-group-item-action">Send Feedback</a>
+            <a href="/student_management/student/feedback" class="list-group-item list-group-item-action">Send Feedback</a>
             <a href="/student_management/student/profile" class="list-group-item list-group-item-action">My Profile</a>
         </t>
+    </template>
+
+    <!-- غلاف صفحات الموظف: عمود أيسر للسايدبار + عمود أيمن للمحتوى -->
+    <template id="staff_page_layout" name="Staff Page Layout">
+        <section class="container py-3">
+            <div class="row">
+                <aside class="col-12 col-md-3 mb-3 mb-md-0">
+                    <div class="list-group">
+                        <t t-call="odoo_student_management.sidebar_menu"/>
+                    </div>
+                </aside>
+                <main class="col-12 col-md-9">
+                    <!-- هنا نَعرض محتوى الداشبورد الأصلي -->
+                    <t t-call="odoo_student_management.staff_dashboard_template"/>
+                </main>
+            </div>
+        </section>
     </template>
 </odoo>
