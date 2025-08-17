@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action for Admin Dashboard -->
+    <record id="action_admin_dashboard" model="ir.actions.act_url">
+        <field name="name">Admin Dashboard</field>
+        <field name="url">/student_management/admin/dashboard</field>
+        <field name="target">self</field>
+    </record>
+
+    <!-- Action for Staff Dashboard -->
+    <record id="action_staff_dashboard" model="ir.actions.act_url">
+        <field name="name">Staff Dashboard</field>
+        <field name="url">/student_management/staff/dashboard</field>
+        <field name="target">self</field>
+    </record>
+
+    <!-- Action for Student Dashboard -->
+    <record id="action_student_dashboard" model="ir.actions.act_url">
+        <field name="name">Student Dashboard</field>
+        <field name="url">/student_management/student/dashboard</field>
+        <field name="target">self</field>
+    </record>
+</odoo>

@@ -1,0 +1,33 @@
+<!-- templates/layout.xml -->
+<odoo>
+    <template id="login_layout_inherit" name="Student Login Page" inherit_id="web.login" primary="True">
+        <xpath expr="//form" position="replace">
+            <!-- أرسل إلى /web/login بدل راوتك -->
+            <form class="oe_login_form" role="form" t-attf-action="/web/login" method="post">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="redirect" value="/student_management/check_user_type"/>
+                <input type="hidden" name="db" t-att-value="request.db"/>  <!-- ستكون sysatd -->
+                
+                <div class="mb-3">
+                    <label for="login" class="form-label">Email</label>
+                    <input type="text" placeholder="Email" name="login" t-att-value="login" id="login"
+                           class="form-control" required="required" autofocus="autofocus" autocapitalize="off"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" placeholder="Password" name="password" id="password"
+                           class="form-control" required="required" autocomplete="current-password"/>
+                </div>
+
+                <p class="alert alert-danger" t-if="error" role="alert">
+                    <t t-out="error"/>
+                </p>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Log in</button>
+                </div>
+            </form>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="staff_dashboard_template" name="Staff Dashboard">
+        <!-- We use the standard Odoo website layout which includes the header, footer, and necessary assets -->
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container my-4">
+                    <!-- Header Section -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                        <div>
+                            <h1 class="mb-0">Staff Dashboard</h1>
+                            <p class="text-muted">Welcome, <t t-esc="staff.name"/>!</p>
+                        </div>
+                        <!-- بديل جاهز بدون أي راوت مخصص -->
+                        <a href="/student_management/staff/logout" class="btn btn-outline-secondary">
+                            <i class="fa fa-sign-out me-1"/> Logout
+                        </a>
+
+                    </div>
+
+                    <!-- Stats Cards Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100 shadow-sm">
+                                <div class="card-body">
+                                    <i class="fa fa-users fa-3x text-primary mb-2"/>
+                                    <h5 class="card-title">Total Students</h5>
+                                    <p class="card-text fs-4 fw-bold"><t t-esc="student_count"/></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100 shadow-sm">
+                                <div class="card-body">
+                                    <i class="fa fa-book fa-3x text-info mb-2"/>
+                                    <h5 class="card-title">Subjects Taught</h5>
+                                    <p class="card-text fs-4 fw-bold"><t t-esc="subjects_count"/></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100 shadow-sm">
+                                <div class="card-body">
+                                    <i class="fa fa-check-square-o fa-3x text-success mb-2"/>
+                                    <h5 class="card-title">Total Attendance</h5>
+                                    <p class="card-text fs-4 fw-bold"><t t-esc="attendance_count"/></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100 shadow-sm">
+                                <div class="card-body">
+                                    <i class="fa fa-calendar-times-o fa-3x text-warning mb-2"/>
+                                    <h5 class="card-title">Approved Leaves</h5>
+                                    <p class="card-text fs-4 fw-bold"><t t-esc="leave_count"/></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content Section -->
+                    <div class="row">
+                        <!-- Left Column: Subject Data -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Attendance by Subject</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group">
+                                        <t t-if="subject_data">
+                                            <t t-foreach="subject_data" t-as="subject">
+                                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <t t-esc="subject['name']"/>
+                                                    <span class="badge bg-primary rounded-pill"><t t-esc="subject['attendance_count']"/> records</span>
+                                                </div>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="list-group-item text-muted">No subjects found.</div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Student Data -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Student Attendance Summary</h5>
+                                </div>
+                                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Student Name</th>
+                                                <th class="text-center">Present</th>
+                                                <th class="text-center">Absent</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-if="student_data">
+                                                <t t-foreach="student_data" t-as="student">
+                                                    <tr>
+                                                        <td><t t-esc="student['name']"/></td>
+                                                        <td class="text-center text-success fw-bold"><t t-esc="student['present_count']"/></td>
+                                                        <td class="text-center text-danger fw-bold"><t t-esc="student['absent_count']"/></td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted">No student data available.</td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

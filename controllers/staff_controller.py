@@ -13,7 +13,7 @@ class StudentManagementStaffController(http.Controller):
 
     def _check_staff_access(self):
         """Check if current user has staff access"""
-        if not request.env.user.has_group('student_management_django_odoo.group_student_management_staff'):
+        if not request.env.user.has_group('odoo_student_management.group_student_management_staff'):
             raise AccessError("Access denied. Staff privileges required.")
 
     def _get_current_staff(self):
@@ -23,7 +23,7 @@ class StudentManagementStaffController(http.Controller):
             raise UserError("Staff record not found for current user")
         return staff
 
-    @http.route('/student_management/staff/dashboard', type='http', auth='user', methods=['GET'])
+    @http.route('/student_management/staff/dashboard', type='http', auth='user', website=True, methods=['GET'])
     def staff_dashboard(self, **kwargs):
         """Staff dashboard page"""
         try:
@@ -32,7 +32,7 @@ class StudentManagementStaffController(http.Controller):
             
             # Get subjects taught by this staff
             subjects = request.env['student_management.subject'].search([('staff_id', '=', staff.id)])
-            
+
             # Get courses for these subjects
             course_ids = subjects.mapped('course_id.id')
             
@@ -77,7 +77,7 @@ class StudentManagementStaffController(http.Controller):
                     'absent_count': absent_count
                 })
             
-            return request.render('student_management_django_odoo.staff_dashboard_template', {
+            return request.render('odoo_student_management.staff_dashboard_template', {
                 'student_count': student_count,
                 'attendance_count': attendance_count,
                 'leave_count': leave_count,
@@ -97,11 +97,10 @@ class StudentManagementStaffController(http.Controller):
         try:
             self._check_staff_access()
             staff = self._get_current_staff()
-            
             subjects = request.env['student_management.subject'].search([('staff_id', '=', staff.id)])
             session_years = request.env['student_management.session_year'].search([])
-            
-            return request.render('student_management_django_odoo.staff_take_attendance', {
+
+            return request.render('odoo_student_management.staff_take_attendance', {
                 'subjects': subjects,
                 'session_years': session_years
             })
@@ -165,7 +164,7 @@ class StudentManagementStaffController(http.Controller):
             for student_info in student_data:
                 student_id = student_info['id']
                 status = student_info['status']
-                
+
                 request.env['student_management.attendance'].sudo().create({
                     'student_id': student_id,
                     'subject_id': subject_id,
@@ -191,11 +190,11 @@ class StudentManagementStaffController(http.Controller):
         try:
             self._check_staff_access()
             staff = self._get_current_staff()
-            
+
             subjects = request.env['student_management.subject'].search([('staff_id', '=', staff.id)])
             session_years = request.env['student_management.session_year'].search([])
-            
-            return request.render('student_management_django_odoo.staff_update_attendance', {
+
+            return request.render('odoo_student_management.staff_update_attendance', {
                 'subjects': subjects,
                 'session_years': session_years
             })
@@ -207,7 +206,7 @@ class StudentManagementStaffController(http.Controller):
         """Get attendance dates for a subject and session year"""
         try:
             self._check_staff_access()
-            
+
             attendances = request.env['student_management.attendance'].search([
                 ('subject_id', '=', subject_id),
                 ('session_year_id', '=', session_year_id)
@@ -240,7 +239,7 @@ class StudentManagementStaffController(http.Controller):
         """Get students attendance for a specific date"""
         try:
             self._check_staff_access()
-            
+
             attendances = request.env['student_management.attendance'].search([
                 ('subject_id', '=', subject_id),
                 ('session_year_id', '=', session_year_id),
@@ -277,7 +276,7 @@ class StudentManagementStaffController(http.Controller):
             for student_info in student_data:
                 attendance_id = student_info['attendance_id']
                 status = student_info['status']
-                
+
                 attendance = request.env['student_management.attendance'].browse(attendance_id)
                 attendance.sudo().write({'status': status})
             
@@ -303,7 +302,7 @@ class StudentManagementStaffController(http.Controller):
             
             if request.httprequest.method == 'GET':
                 subjects = request.env['student_management.subject'].search([('staff_id', '=', staff.id)])
-                return request.render('student_management_django_odoo.staff_add_result', {
+                return request.render('odoo_student_management.staff_add_result', {
                     'subjects': subjects
                 })
             
@@ -315,7 +314,7 @@ class StudentManagementStaffController(http.Controller):
             
             if not all([student_id, subject_id, total_marks]):
                 subjects = request.env['student_management.subject'].search([('staff_id', '=', staff.id)])
-                return request.render('student_management_django_odoo.staff_add_result', {
+                return request.render('odoo_student_management.staff_add_result', {
                     'subjects': subjects,
                     'error': 'All required fields must be filled'
                 })
@@ -334,14 +333,14 @@ class StudentManagementStaffController(http.Controller):
                 })
                 
                 subjects = request.env['student_management.subject'].search([('staff_id', '=', staff.id)])
-                return request.render('student_management_django_odoo.staff_add_result', {
+                return request.render('odoo_student_management.staff_add_result', {
                     'subjects': subjects,
                     'success': 'Student result added successfully'
                 })
             except Exception as e:
                 _logger.error(f"Error adding student result: {str(e)}")
                 subjects = request.env['student_management.subject'].search([('staff_id', '=', staff.id)])
-                return request.render('student_management_django_odoo.staff_add_result', {
+                return request.render('odoo_student_management.staff_add_result', {
                     'subjects': subjects,
                     'error': 'Failed to add student result'
                 })
@@ -358,14 +357,14 @@ class StudentManagementStaffController(http.Controller):
             staff = self._get_current_staff()
             
             if request.httprequest.method == 'GET':
-                return request.render('student_management_django_odoo.staff_apply_leave')
-            
+                return request.render('odoo_student_management.staff_apply_leave')
+
             # Handle POST request
             leave_date = kwargs.get('leave_date')
             leave_message = kwargs.get('leave_message')
             
             if not all([leave_date, leave_message]):
-                return request.render('student_management_django_odoo.staff_apply_leave', {
+                return request.render('odoo_student_management.staff_apply_leave', {
                     'error': 'All fields are required'
                 })
             
@@ -376,13 +375,35 @@ class StudentManagementStaffController(http.Controller):
                     'leave_message': leave_message,
                     'leave_status': 'pending',
                 })
-                return request.render('student_management_django_odoo.staff_apply_leave', {
+                return request.render('odoo_student_management.staff_apply_leave', {
                     'success': 'Leave applied successfully'
                 })
             except Exception as e:
                 _logger.error(f"Error applying leave: {str(e)}")
-                return request.render('student_management_django_odoo.staff_apply_leave', {
+                return request.render('odoo_student_management.staff_apply_leave', {
                     'error': 'Failed to apply leave'
                 })
         except AccessError:
             return request.redirect('/student_management/login')
+
+
+    @http.route(
+    ['/student_management/staff/logout'],
+    type='http', auth='public', methods=['GET', 'POST'], csrf=False, website=True
+)
+    def staff_logout(self, **kwargs):
+        """Logout route dedicated for Staff dashboard button with correct redirect."""
+        # احفظ اسم قاعدة البيانات قبل الـ logout
+        current_db = request.env.cr.dbname
+
+        try:
+            request.session.logout()
+        except Exception as e:
+            _logger.warning("Staff logout called but session not active or other issue: %s", e)
+
+        # لو ما أُرسل redirect، نحدده لصفحة الدخول ومعها redirect إلى check_user_type + db الصحيح
+        target = kwargs.get('redirect')
+        if not target:
+            target = f"/web/login?redirect=/student_management/check_user_type&db={current_db}"
+
+        return request.redirect(target)

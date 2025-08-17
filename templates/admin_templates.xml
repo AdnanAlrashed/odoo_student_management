@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- لوحة تحكم المدير -->
+    <template id="admin_dashboard_template" name="Admin Dashboard">
+        <t t-call="odoo_student_management.layout">
+            <t t-set="title">Admin Dashboard</t>
+            <h1>Welcome, Admin!</h1>
+            <p>This is your dashboard. You can manage students, staff, courses, and subjects from here.</p>
+            <!-- يمكنك إضافة إحصائيات ومخططات بيانية هنا باستخدام JavaScript -->
+        </t>
+    </template>
+
+    <!-- إضافة موظف -->
+    <template id="add_staff_template" name="Add Staff">
+        <t t-call="odoo_student_management.layout">
+            <t t-set="title">Add Staff</t>
+            <h2>Add New Staff Member</h2>
+            <form action="/student_management/admin/staff/add" method="post">
+                <!-- ... حقول النموذج لإضافة موظف ... -->
+                <button type="submit" class="btn btn-primary">Add Staff</button>
+            </form>
+        </t>
+    </template>
+
+    <!-- إدارة الموظفين -->
+    <template id="manage_staff_template" name="Manage Staff">
+        <t t-call="odoo_student_management.layout">
+            <t t-set="title">Manage Staff</t>
+            <h2>Staff List</h2>
+            <table class="table">
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="staffs" t-as="staff">
+                        <td t-esc="staff.name"/>
+                        <td t-esc="staff.email"/>
+                        <td><a t-attf-href="/student_management/admin/staff/edit/{{staff.id}}" class="btn btn-sm btn-primary">Edit</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </t>
+    </template>
+    
+    <!-- يمكنك إضافة قوالب أخرى هنا (إضافة طالب، إدارة الدورات، إلخ) بنفس النمط -->
+</odoo>

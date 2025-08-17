@@ -1,60 +1,43 @@
-import json
+# -*- coding: utf-8 -*-
 import logging
-from odoo import http, fields
+from odoo import http
 from odoo.http import request
-from odoo.exceptions import AccessError, UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
 
 
 class StudentManagementMainController(http.Controller):
-    """Main controller for Student Management System authentication and common functions"""
 
-    @http.route('/student_management/login', type='http', auth='public', methods=['GET', 'POST'], csrf=False)
-    def login_page(self, **kwargs):
-        """Display login page or handle login request"""
-        if request.httprequest.method == 'GET':
-            return request.render('student_management_django_odoo.login_page_template')
-        
-        # Handle POST login request
-        email = kwargs.get('email')
-        password = kwargs.get('password')
-        
-        if not email or not password:
-            return request.render('student_management_django_odoo.login_page_template', {
-                'error': 'Email and password are required'
-            })
-        
+    @http.route('/student_management/login', type='http', auth='public', methods=['GET'], website=True)
+    def login_page(self, **post):
+        """عرض صفحة الدخول المخصصة (الـ POST يذهب مباشرةً إلى /web/login عبر القالب)."""
+        values = {
+            'redirect': post.get('redirect') or '/student_management/check_user_type',
+            'login': post.get('login', ''),
+            'error': post.get('error'),
+        }
+        # تأكد من xml_id الصحيح حسب اسم الموديول لديك
+        return request.render('odoo_student_management.login_layout_inherit', values)
+
+    @http.route('/student_management/check_user_type', type='http', auth='user', website=True)
+    def check_user_type(self, **kwargs):
+        """بعد نجاح المصادقة في /web/login، هذا الراوت يحدد نوع المستخدم ويوجهه."""
+        user = request.env.user
         try:
-            # Authenticate user
-            uid = request.session.authenticate(request.session.db, email, password)
-            if uid:
-                user = request.env['res.users'].sudo().browse(uid)
-                
-                # Determine user type and redirect accordingly
-                if user.has_group('student_management_django_odoo.group_student_management_admin'):
-                    return request.redirect('/student_management/admin/dashboard')
-                elif user.has_group('student_management_django_odoo.group_student_management_staff'):
-                    return request.redirect('/student_management/staff/dashboard')
-                elif user.has_group('student_management_django_odoo.group_student_management_student'):
-                    return request.redirect('/student_management/student/dashboard')
-                else:
-                    return request.render('student_management_django_odoo.login_page_template', {
-                        'error': 'User does not have access to Student Management System'
-                    })
-            else:
-                return request.render('student_management_django_odoo.login_page_template', {
-                    'error': 'Invalid email or password'
-                })
+            if user.has_group('odoo_student_management.group_student_management_admin'):
+                return request.redirect('/student_management/admin/dashboard')
+            elif user.has_group('odoo_student_management.group_student_management_staff'):
+                return request.redirect('/student_management/staff/dashboard')
+            elif user.has_group('odoo_student_management.group_student_management_student'):
+                return request.redirect('/student_management/student/dashboard')
+            # إن لم يطابق أي مجموعة:
+            return request.redirect('/web')
         except Exception as e:
-            _logger.error(f"Login error: {str(e)}")
-            return request.render('student_management_django_odoo.login_page_template', {
-                'error': 'Login failed. Please try again.'
-            })
+            _logger.error("Error in check_user_type: %s", e)
+            return request.redirect('/student_management/login?error=System error, please try again')
 
-    @http.route('/student_management/logout', type='http', auth='user', methods=['GET'])
+    @http.route(['/student_management/logout', '/sms/logout'], type='http', auth='user', methods=['GET'])
     def logout(self, **kwargs):
-        """Logout user and redirect to login page"""
         request.session.logout()
         return request.redirect('/student_management/login')
 
@@ -65,11 +48,11 @@ class StudentManagementMainController(http.Controller):
             user = request.env.user
             user_type = 'unknown'
             
-            if user.has_group('student_management_django_odoo.group_student_management_admin'):
+            if user.has_group('odoo_student_management.group_student_management_admin'):
                 user_type = 'admin'
-            elif user.has_group('student_management_django_odoo.group_student_management_staff'):
+            elif user.has_group('odoo_student_management.group_student_management_staff'):
                 user_type = 'staff'
-            elif user.has_group('student_management_django_odoo.group_student_management_student'):
+            elif user.has_group('odoo_student_management.group_student_management_student'):
                 user_type = 'student'
             
             return {
@@ -93,7 +76,7 @@ class StudentManagementMainController(http.Controller):
         """Get dashboard statistics for admin users"""
         try:
             # Check if user is admin
-            if not request.env.user.has_group('student_management_django_odoo.group_student_management_admin'):
+            if not request.env.user.has_group('odoo_student_management.group_student_management_admin'):
                 raise AccessError("Access denied. Admin privileges required.")
             
             # Get basic counts
@@ -198,7 +181,7 @@ class StudentManagementMainController(http.Controller):
             user = request.env.user
             notifications = []
             
-            if user.has_group('student_management_django_odoo.group_student_management_student'):
+            if user.has_group('odoo_student_management.group_student_management_student'):
                 # Get student notifications
                 student = request.env['student_management.student'].search([('user_id', '=', user.id)], limit=1)
                 if student:
@@ -217,7 +200,7 @@ class StudentManagementMainController(http.Controller):
                             'date': notif.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                         })
             
-            elif user.has_group('student_management_django_odoo.group_student_management_staff'):
+            elif user.has_group('odoo_student_management.group_student_management_staff'):
                 # Get staff notifications
                 staff = request.env['student_management.staff'].search([('user_id', '=', user.id)], limit=1)
                 if staff:
@@ -253,13 +236,13 @@ class StudentManagementMainController(http.Controller):
         try:
             user = request.env.user
             
-            if user.has_group('student_management_django_odoo.group_student_management_student'):
+            if user.has_group('odoo_student_management.group_student_management_student'):
                 notification = request.env['student_management.notification_student'].browse(notification_id)
                 if notification.student_id.user_id.id == user.id:
                     notification.action_mark_as_read()
                     return {'success': True}
             
-            elif user.has_group('student_management_django_odoo.group_student_management_staff'):
+            elif user.has_group('odoo_student_management.group_student_management_staff'):
                 notification = request.env['student_management.notification_staff'].browse(notification_id)
                 if notification.staff_id.user_id.id == user.id:
                     notification.action_mark_as_read()

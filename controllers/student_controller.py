@@ -13,7 +13,7 @@ class StudentManagementStudentController(http.Controller):
 
     def _check_student_access(self):
         """Check if current user has student access"""
-        if not request.env.user.has_group('student_management_django_odoo.group_student_management_student'):
+        if not request.env.user.has_group('odoo_student_management.group_student_management_student'):
             raise AccessError("Access denied. Student privileges required.")
 
     def _get_current_student(self):
@@ -64,7 +64,7 @@ class StudentManagementStudentController(http.Controller):
                     'absent_count': absent_count
                 })
             
-            return request.render('student_management_django_odoo.student_dashboard_template', {
+            return request.render('odoo_student_management.student_dashboard_template', {
                 'total_attendance': total_attendance,
                 'present_attendance': present_attendance,
                 'absent_attendance': absent_attendance,
@@ -86,7 +86,7 @@ class StudentManagementStudentController(http.Controller):
             
             if request.httprequest.method == 'GET':
                 subjects = request.env['student_management.subject'].search([('course_id', '=', student.course_id.id)])
-                return request.render('student_management_django_odoo.student_view_attendance', {
+                return request.render('odoo_student_management.student_view_attendance', {
                     'subjects': subjects
                 })
             
@@ -97,7 +97,7 @@ class StudentManagementStudentController(http.Controller):
             
             if not all([subject_id, start_date, end_date]):
                 subjects = request.env['student_management.subject'].search([('course_id', '=', student.course_id.id)])
-                return request.render('student_management_django_odoo.student_view_attendance', {
+                return request.render('odoo_student_management.student_view_attendance', {
                     'subjects': subjects,
                     'error': 'All fields are required'
                 })
@@ -112,7 +112,7 @@ class StudentManagementStudentController(http.Controller):
             attendance_records = request.env['student_management.attendance'].search(domain)
             
             subjects = request.env['student_management.subject'].search([('course_id', '=', student.course_id.id)])
-            return request.render('student_management_django_odoo.student_attendance_data', {
+            return request.render('odoo_student_management.student_attendance_data', {
                 'attendance_records': attendance_records,
                 'subjects': subjects,
                 'selected_subject_id': int(subject_id),
@@ -134,7 +134,7 @@ class StudentManagementStudentController(http.Controller):
             if request.httprequest.method == 'GET':
                 # Get existing leave requests
                 leave_requests = request.env['student_management.leave_report_student'].search([('student_id', '=', student.id)])
-                return request.render('student_management_django_odoo.student_apply_leave', {
+                return request.render('odoo_student_management.student_apply_leave', {
                     'leave_requests': leave_requests
                 })
             
@@ -144,7 +144,7 @@ class StudentManagementStudentController(http.Controller):
             
             if not all([leave_date, leave_message]):
                 leave_requests = request.env['student_management.leave_report_student'].search([('student_id', '=', student.id)])
-                return request.render('student_management_django_odoo.student_apply_leave', {
+                return request.render('odoo_student_management.student_apply_leave', {
                     'leave_requests': leave_requests,
                     'error': 'All fields are required'
                 })
@@ -158,14 +158,14 @@ class StudentManagementStudentController(http.Controller):
                 })
                 
                 leave_requests = request.env['student_management.leave_report_student'].search([('student_id', '=', student.id)])
-                return request.render('student_management_django_odoo.student_apply_leave', {
+                return request.render('odoo_student_management.student_apply_leave', {
                     'leave_requests': leave_requests,
                     'success': 'Leave application submitted successfully'
                 })
             except Exception as e:
                 _logger.error(f"Error applying for leave: {str(e)}")
                 leave_requests = request.env['student_management.leave_report_student'].search([('student_id', '=', student.id)])
-                return request.render('student_management_django_odoo.student_apply_leave', {
+                return request.render('odoo_student_management.student_apply_leave', {
                     'leave_requests': leave_requests,
                     'error': 'Failed to submit leave application'
                 })
@@ -184,7 +184,7 @@ class StudentManagementStudentController(http.Controller):
             if request.httprequest.method == 'GET':
                 # Get existing feedback
                 feedback_records = request.env['student_management.feedback_student'].search([('student_id', '=', student.id)])
-                return request.render('student_management_django_odoo.student_feedback', {
+                return request.render('odoo_student_management.student_feedback', {
                     'feedback_records': feedback_records
                 })
             
@@ -195,7 +195,7 @@ class StudentManagementStudentController(http.Controller):
             
             if not feedback_message:
                 feedback_records = request.env['student_management.feedback_student'].search([('student_id', '=', student.id)])
-                return request.render('student_management_django_odoo.student_feedback', {
+                return request.render('odoo_student_management.student_feedback', {
                     'feedback_records': feedback_records,
                     'error': 'Feedback message is required'
                 })
@@ -209,14 +209,14 @@ class StudentManagementStudentController(http.Controller):
                 })
                 
                 feedback_records = request.env['student_management.feedback_student'].search([('student_id', '=', student.id)])
-                return request.render('student_management_django_odoo.student_feedback', {
+                return request.render('odoo_student_management.student_feedback', {
                     'feedback_records': feedback_records,
                     'success': 'Feedback submitted successfully'
                 })
             except Exception as e:
                 _logger.error(f"Error submitting feedback: {str(e)}")
                 feedback_records = request.env['student_management.feedback_student'].search([('student_id', '=', student.id)])
-                return request.render('student_management_django_odoo.student_feedback', {
+                return request.render('odoo_student_management.student_feedback', {
                     'feedback_records': feedback_records,
                     'error': 'Failed to submit feedback'
                 })
@@ -248,7 +248,7 @@ class StudentManagementStudentController(http.Controller):
                     subject_results[subject_name] = []
                 subject_results[subject_name].append(result)
             
-            return request.render('student_management_django_odoo.student_view_result', {
+            return request.render('odoo_student_management.student_view_result', {
                 'results': results,
                 'subject_results': subject_results,
                 'total_subjects': total_subjects,
@@ -269,7 +269,7 @@ class StudentManagementStudentController(http.Controller):
             student = self._get_current_student()
             
             if request.httprequest.method == 'GET':
-                return request.render('student_management_django_odoo.student_profile', {
+                return request.render('odoo_student_management.student_profile', {
                     'student': student
                 })
             
@@ -297,13 +297,13 @@ class StudentManagementStudentController(http.Controller):
                     'address': address,
                 })
                 
-                return request.render('student_management_django_odoo.student_profile', {
+                return request.render('odoo_student_management.student_profile', {
                     'student': student,
                     'success': 'Profile updated successfully'
                 })
             except Exception as e:
                 _logger.error(f"Error updating profile: {str(e)}")
-                return request.render('student_management_django_odoo.student_profile', {
+                return request.render('odoo_student_management.student_profile', {
                     'student': student,
                     'error': 'Failed to update profile'
                 })
@@ -329,7 +329,7 @@ class StudentManagementStudentController(http.Controller):
             if unread_notifications:
                 unread_notifications.sudo().write({'is_read': True})
             
-            return request.render('student_management_django_odoo.student_notifications', {
+            return request.render('odoo_student_management.student_notifications', {
                 'notifications': notifications,
                 'student': student
             })

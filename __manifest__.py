@@ -37,7 +37,7 @@
     'author': 'Manus AI',
     'website': 'https://manus.ai',
     'license': 'LGPL-3',
-    'depends': ['base', 'web', 'mail', 'documents'],
+    'depends': ['base', 'web', 'mail', 'documents', 'website'],
     'data': [
         # Security
         'security/groups.xml',
@@ -64,12 +64,23 @@
         'views/staff_profile_views.xml',
         'views/profile/student_profile_views.xml',
         'views/menu.xml',
+        'views/menu_actions.xml',
+
+         # =======================================================
+        #           ADD THE NEW TEMPLATE FILES HERE
+        # =======================================================
+        'templates/menus.xml',
+        'templates/layout.xml',
+        'templates/admin_templates.xml',
+        'templates/staff_dashboard_template.xml',
+        'templates/student_templates.xml',
+
         'reports/attendance_report.xml'
     ],
     'assets': {
         'web.assets_backend': [
-            # 'student_management_django_odoo/static/src/css/student_management.css',
-            # 'student_management_django_odoo/static/src/js/student_management.js',
+            # 'odoo_student_management/static/src/css/student_management.css',
+            # 'odoo_student_management/static/src/js/student_management.js',
         ],
     },
     'demo': [],

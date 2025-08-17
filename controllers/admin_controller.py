@@ -13,28 +13,28 @@ class StudentManagementAdminController(http.Controller):
 
     def _check_admin_access(self):
         """Check if current user has admin access"""
-        if not request.env.user.has_group('student_management_django_odoo.group_student_management_admin'):
+        if not request.env.user.has_group('odoo_student_management.group_student_management_admin'):
             raise AccessError("Access denied. Admin privileges required.")
 
-    @http.route('/student_management/admin/dashboard', type='http', auth='user', methods=['GET'])
+    @http.route('/student_management/admin/dashboard', type='http', auth='user', website=True, methods=['GET'])
     def admin_dashboard(self, **kwargs):
         """Admin dashboard page"""
         try:
             self._check_admin_access()
-            return request.render('student_management_django_odoo.admin_dashboard_template')
+            return request.render('odoo_student_management.admin_dashboard_template')
         except AccessError:
             return request.redirect('/student_management/login')
 
     # ==================== STAFF MANAGEMENT ====================
 
-    @http.route('/student_management/admin/staff/add', type='http', auth='user', methods=['GET', 'POST'])
+    @http.route('/student_management/admin/staff/add', type='http', auth='user',  website=True, methods=['GET', 'POST'])
     def add_staff(self, **kwargs):
         """Add new staff member"""
         try:
             self._check_admin_access()
             
             if request.httprequest.method == 'GET':
-                return request.render('student_management_django_odoo.add_staff_template')
+                return request.render('odoo_student_management.add_staff_template')
             
             # Handle POST request
             first_name = kwargs.get('first_name')
@@ -45,7 +45,7 @@ class StudentManagementAdminController(http.Controller):
             address = kwargs.get('address')
             
             if not all([first_name, last_name, username, email, password]):
-                return request.render('student_management_django_odoo.add_staff_template', {
+                return request.render('odoo_student_management.add_staff_template', {
                     'error': 'All fields are required'
                 })
             
@@ -56,7 +56,7 @@ class StudentManagementAdminController(http.Controller):
                     'login': email,
                     'email': email,
                     'password': password,
-                    'groups_id': [(6, 0, [request.env.ref('student_management_django_odoo.group_student_management_staff').id])]
+                    'groups_id': [(6, 0, [request.env.ref('odoo_student_management.group_student_management_staff').id])]
                 }
                 user = request.env['res.users'].sudo().create(user_vals)
                 
@@ -69,24 +69,24 @@ class StudentManagementAdminController(http.Controller):
                 }
                 request.env['student_management.staff'].sudo().create(staff_vals)
                 
-                return request.render('student_management_django_odoo.add_staff_template', {
+                return request.render('odoo_student_management.add_staff_template', {
                     'success': 'Staff member added successfully'
                 })
             except Exception as e:
                 _logger.error(f"Error adding staff: {str(e)}")
-                return request.render('student_management_django_odoo.add_staff_template', {
+                return request.render('odoo_student_management.add_staff_template', {
                     'error': 'Failed to add staff member'
                 })
         except AccessError:
             return request.redirect('/student_management/login')
 
-    @http.route('/student_management/admin/staff/manage', type='http', auth='user', methods=['GET'])
+    @http.route('/student_management/admin/staff/manage', type='http', auth='user',  website=True, methods=['GET'])
     def manage_staff(self, **kwargs):
         """Manage staff members"""
         try:
             self._check_admin_access()
             staffs = request.env['student_management.staff'].search([])
-            return request.render('student_management_django_odoo.manage_staff_template', {
+            return request.render('odoo_student_management.manage_staff_template', {
                 'staffs': staffs
             })
         except AccessError:
@@ -103,7 +103,7 @@ class StudentManagementAdminController(http.Controller):
                 return request.redirect('/student_management/admin/staff/manage')
             
             if request.httprequest.method == 'GET':
-                return request.render('student_management_django_odoo.edit_staff_template', {
+                return request.render('odoo_student_management.edit_staff_template', {
                     'staff': staff
                 })
             
@@ -127,13 +127,13 @@ class StudentManagementAdminController(http.Controller):
                     'address': address,
                 })
                 
-                return request.render('student_management_django_odoo.edit_staff_template', {
+                return request.render('odoo_student_management.edit_staff_template', {
                     'staff': staff,
                     'success': 'Staff member updated successfully'
                 })
             except Exception as e:
                 _logger.error(f"Error updating staff: {str(e)}")
-                return request.render('student_management_django_odoo.edit_staff_template', {
+                return request.render('odoo_student_management.edit_staff_template', {
                     'staff': staff,
                     'error': 'Failed to update staff member'
                 })
@@ -151,7 +151,7 @@ class StudentManagementAdminController(http.Controller):
             if request.httprequest.method == 'GET':
                 courses = request.env['student_management.course'].search([])
                 session_years = request.env['student_management.session_year'].search([])
-                return request.render('student_management_django_odoo.add_student_template', {
+                return request.render('odoo_student_management.add_student_template', {
                     'courses': courses,
                     'session_years': session_years
                 })
@@ -171,7 +171,7 @@ class StudentManagementAdminController(http.Controller):
             if not all([first_name, last_name, username, email, password, course_id, session_year_id]):
                 courses = request.env['student_management.course'].search([])
                 session_years = request.env['student_management.session_year'].search([])
-                return request.render('student_management_django_odoo.add_student_template', {
+                return request.render('odoo_student_management.add_student_template', {
                     'courses': courses,
                     'session_years': session_years,
                     'error': 'All required fields must be filled'
@@ -184,7 +184,7 @@ class StudentManagementAdminController(http.Controller):
                     'login': email,
                     'email': email,
                     'password': password,
-                    'groups_id': [(6, 0, [request.env.ref('student_management_django_odoo.group_student_management_student').id])]
+                    'groups_id': [(6, 0, [request.env.ref('odoo_student_management.group_student_management_student').id])]
                 }
                 user = request.env['res.users'].sudo().create(user_vals)
                 
@@ -208,7 +208,7 @@ class StudentManagementAdminController(http.Controller):
                 
                 courses = request.env['student_management.course'].search([])
                 session_years = request.env['student_management.session_year'].search([])
-                return request.render('student_management_django_odoo.add_student_template', {
+                return request.render('odoo_student_management.add_student_template', {
                     'courses': courses,
                     'session_years': session_years,
                     'success': 'Student added successfully'
@@ -217,7 +217,7 @@ class StudentManagementAdminController(http.Controller):
                 _logger.error(f"Error adding student: {str(e)}")
                 courses = request.env['student_management.course'].search([])
                 session_years = request.env['student_management.session_year'].search([])
-                return request.render('student_management_django_odoo.add_student_template', {
+                return request.render('odoo_student_management.add_student_template', {
                     'courses': courses,
                     'session_years': session_years,
                     'error': 'Failed to add student'
@@ -231,7 +231,7 @@ class StudentManagementAdminController(http.Controller):
         try:
             self._check_admin_access()
             students = request.env['student_management.student'].search([])
-            return request.render('student_management_django_odoo.manage_student_template', {
+            return request.render('odoo_student_management.manage_student_template', {
                 'students': students
             })
         except AccessError:
@@ -250,7 +250,7 @@ class StudentManagementAdminController(http.Controller):
             if request.httprequest.method == 'GET':
                 courses = request.env['student_management.course'].search([])
                 session_years = request.env['student_management.session_year'].search([])
-                return request.render('student_management_django_odoo.edit_student_template', {
+                return request.render('odoo_student_management.edit_student_template', {
                     'student': student,
                     'courses': courses,
                     'session_years': session_years
@@ -291,7 +291,7 @@ class StudentManagementAdminController(http.Controller):
                 
                 courses = request.env['student_management.course'].search([])
                 session_years = request.env['student_management.session_year'].search([])
-                return request.render('student_management_django_odoo.edit_student_template', {
+                return request.render('odoo_student_management.edit_student_template', {
                     'student': student,
                     'courses': courses,
                     'session_years': session_years,
@@ -301,7 +301,7 @@ class StudentManagementAdminController(http.Controller):
                 _logger.error(f"Error updating student: {str(e)}")
                 courses = request.env['student_management.course'].search([])
                 session_years = request.env['student_management.session_year'].search([])
-                return request.render('student_management_django_odoo.edit_student_template', {
+                return request.render('odoo_student_management.edit_student_template', {
                     'student': student,
                     'courses': courses,
                     'session_years': session_years,
@@ -319,13 +319,13 @@ class StudentManagementAdminController(http.Controller):
             self._check_admin_access()
             
             if request.httprequest.method == 'GET':
-                return request.render('student_management_django_odoo.add_course_template')
+                return request.render('odoo_student_management.add_course_template')
             
             # Handle POST request
             course_name = kwargs.get('course_name')
             
             if not course_name:
-                return request.render('student_management_django_odoo.add_course_template', {
+                return request.render('odoo_student_management.add_course_template', {
                     'error': 'Course name is required'
                 })
             
@@ -334,12 +334,12 @@ class StudentManagementAdminController(http.Controller):
                     'course_name': course_name
                 })
                 
-                return request.render('student_management_django_odoo.add_course_template', {
+                return request.render('odoo_student_management.add_course_template', {
                     'success': 'Course added successfully'
                 })
             except Exception as e:
                 _logger.error(f"Error adding course: {str(e)}")
-                return request.render('student_management_django_odoo.add_course_template', {
+                return request.render('odoo_student_management.add_course_template', {
                     'error': 'Failed to add course'
                 })
         except AccessError:
@@ -351,7 +351,7 @@ class StudentManagementAdminController(http.Controller):
         try:
             self._check_admin_access()
             courses = request.env['student_management.course'].search([])
-            return request.render('student_management_django_odoo.manage_course_template', {
+            return request.render('odoo_student_management.manage_course_template', {
                 'courses': courses
             })
         except AccessError:
@@ -368,7 +368,7 @@ class StudentManagementAdminController(http.Controller):
             if request.httprequest.method == 'GET':
                 courses = request.env['student_management.course'].search([])
                 staffs = request.env['student_management.staff'].search([])
-                return request.render('student_management_django_odoo.add_subject_template', {
+                return request.render('odoo_student_management.add_subject_template', {
                     'courses': courses,
                     'staffs': staffs
                 })
@@ -381,7 +381,7 @@ class StudentManagementAdminController(http.Controller):
             if not all([subject_name, course_id, staff_id]):
                 courses = request.env['student_management.course'].search([])
                 staffs = request.env['student_management.staff'].search([])
-                return request.render('student_management_django_odoo.add_subject_template', {
+                return request.render('odoo_student_management.add_subject_template', {
                     'courses': courses,
                     'staffs': staffs,
                     'error': 'All fields are required'
@@ -396,7 +396,7 @@ class StudentManagementAdminController(http.Controller):
                 
                 courses = request.env['student_management.course'].search([])
                 staffs = request.env['student_management.staff'].search([])
-                return request.render('student_management_django_odoo.add_subject_template', {
+                return request.render('odoo_student_management.add_subject_template', {
                     'courses': courses,
                     'staffs': staffs,
                     'success': 'Subject added successfully'
@@ -405,7 +405,7 @@ class StudentManagementAdminController(http.Controller):
                 _logger.error(f"Error adding subject: {str(e)}")
                 courses = request.env['student_management.course'].search([])
                 staffs = request.env['student_management.staff'].search([])
-                return request.render('student_management_django_odoo.add_subject_template', {
+                return request.render('odoo_student_management.add_subject_template', {
                     'courses': courses,
                     'staffs': staffs,
                     'error': 'Failed to add subject'
@@ -419,7 +419,7 @@ class StudentManagementAdminController(http.Controller):
         try:
             self._check_admin_access()
             subjects = request.env['student_management.subject'].search([])
-            return request.render('student_management_django_odoo.manage_subject_template', {
+            return request.render('odoo_student_management.manage_subject_template', {
                 'subjects': subjects
             })
         except AccessError:
@@ -435,7 +435,7 @@ class StudentManagementAdminController(http.Controller):
             if request.httprequest.method == 'GET':
                 courses = request.env['student_management.course'].search([])
                 staffs = request.env['student_management.staff'].search([])
-                return request.render('student_management_django_odoo.edit_subject_template', {
+                return request.render('odoo_student_management.edit_subject_template', {
                     'subject': subject,
                     'courses': courses,
                     'staffs': staffs
@@ -449,7 +449,7 @@ class StudentManagementAdminController(http.Controller):
             if not all([subject_name, course_id, staff_id]):
                 courses = request.env['student_management.course'].search([])
                 staffs = request.env['student_management.staff'].search([])
-                return request.render('student_management_django_odoo.edit_subject_template', {
+                return request.render('odoo_student_management.edit_subject_template', {
                     'subject': subject,
                     'courses': courses,
                     'staffs': staffs,
@@ -465,7 +465,7 @@ class StudentManagementAdminController(http.Controller):
 
                 courses = request.env['student_management.course'].search([])
                 staffs = request.env['student_management.staff'].search([])
-                return request.render('student_management_django_odoo.edit_subject_template', {
+                return request.render('odoo_student_management.edit_subject_template', {
                     'subject': subject,
                     'courses': courses,
                     'staffs': staffs,
@@ -475,7 +475,7 @@ class StudentManagementAdminController(http.Controller):
                 _logger.error(f"Error updating subject: {str(e)}")
                 courses = request.env['student_management.course'].search([])
                 staffs = request.env['student_management.staff'].search([])
-                return request.render('student_management_django_odoo.edit_subject_template', {
+                return request.render('odoo_student_management.edit_subject_template', {
                     'subject': subject,
                     'courses': courses,
                     'staffs': staffs,

@@ -200,7 +200,7 @@ class Staff(models.Model):
     def create(self, vals_list):
         """Override create to ensure users are assigned to staff group"""
         staffs = super().create(vals_list)
-        staff_group = self.env.ref('student_management_django_odoo.group_student_management_staff', raise_if_not_found=False)
+        staff_group = self.env.ref('odoo_student_management.group_student_management_staff', raise_if_not_found=False)
         
         if self.env.context.get('staff_profile_editing'):
             existing = self.search([('user_id', '=', self.env.uid)], limit=1)

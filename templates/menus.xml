@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sidebar_menu" name="Sidebar Menu">
+        <!-- قائمة المدير -->
+        <t t-if="request.env.user.has_group('odoo_student_management.group_student_management_admin')">
+            <a href="/student_management/admin/dashboard" class="list-group-item list-group-item-action">Dashboard</a>
+            <div class="list-group-item"><strong>Staff</strong></div>
+            <a href="/student_management/admin/staff/add" class="list-group-item list-group-item-action">Add Staff</a>
+            <a href="/student_management/admin/staff/manage" class="list-group-item list-group-item-action">Manage Staff</a>
+            <div class="list-group-item"><strong>Student</strong></div>
+            <a href="/student_management/admin/student/add" class="list-group-item list-group-item-action">Add Student</a>
+            <a href="/student_management/admin/student/manage" class="list-group-item list-group-item-action">Manage Student</a>
+            <div class="list-group-item"><strong>Course &amp; Subject</strong></div>
+            <a href="/student_management/admin/course/add" class="list-group-item list-group-item-action">Add Course</a>
+            <a href="/student_management/admin/course/manage" class="list-group-item list-group-item-action">Manage Course</a>
+            <a href="/student_management/admin/subject/add" class="list-group-item list-group-item-action">Add Subject</a>
+            <a href="/student_management/admin/subject/manage" class="list-group-item list-group-item-action">Manage Subject</a>
+        </t>
+
+        <!-- قائمة الموظف -->
+        <t t-if="request.env.user.has_group('odoo_student_management.group_student_management_staff')">
+            <a href="/student_management/staff/dashboard" class="list-group-item list-group-item-action">Dashboard</a>
+            <a href="/student_management/staff/attendance/take" class="list-group-item list-group-item-action">Take Attendance</a>
+            <a href="/student_management/staff/attendance/update" class="list-group-item list-group-item-action">Update Attendance</a>
+            <a href="/student_management/staff/results/add" class="list-group-item list-group-item-action">Add Results</a>
+            <a href="/student_management/staff/leave/apply" class="list-group-item list-group-item-action">Apply for Leave</a>
+        </t>
+
+        <!-- قائمة الطالب -->
+        <t t-if="request.env.user.has_group('odoo_student_management.group_student_management_student')">
+            <a href="/student_management/student/dashboard" class="list-group-item list-group-item-action">Dashboard</a>
+            <a href="/student_management/student/attendance/view" class="list-group-item list-group-item-action">View Attendance</a>
+            <a href="/student_management/student/results/view" class="list-group-item list-group-item-action">View Results</a>
+            <a href="/student_management/student/leave/apply" class="list-group-item list-group-item-action">Apply for Leave</a>
+            <a href="/student_management/student/feedback" class="list_group-item list-group-item-action">Send Feedback</a>
+            <a href="/student_management/student/profile" class="list-group-item list-group-item-action">My Profile</a>
+        </t>
+    </template>
+</odoo>

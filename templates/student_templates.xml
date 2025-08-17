@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="student_dashboard_template" name="Student Dashboard">
+        <t t-call="odoo_student_management.layout">
+            <t t-set="title">Student Dashboard</t>
+            <h1>Welcome, <t t-esc="student.name"/>!</h1>
+            <p>This is your dashboard. You can view your attendance, results, and apply for leave.</p>
+        </t>
+    </template>
+</odoo>
