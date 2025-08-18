@@ -362,27 +362,65 @@
     </template>
 
     <!-- Manage Staff -->
-    <template id="manage_staff_template" name="Manage Staff">
+    <template id="edit_staff_template" name="Edit Staff">
         <t t-call="odoo_student_management.portal_two_col_layout">
-            <t t-set="title">Manage Staff</t>
-            <h2>Staff List</h2>
-            <table class="table">
-                <thead>
-                    <tr><th>Name</th><th>Email</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
-                    <tr t-foreach="staffs" t-as="staff">
-                        <td t-esc="staff.name"/>
-                        <td t-esc="staff.email"/>
-                        <td><a t-attf-href="/student_management/admin/staff/edit/{{staff.id}}" class="btn btn-sm btn-primary">Edit</a></td>
-                    </tr>
-                </tbody>
-            </table>
+            <t t-set="title">Edit Staff</t>
+
+            <h2>Edit Staff Member</h2>
+
+            <t t-if="error">
+            <div class="alert alert-danger" role="alert" t-esc="error"/>
+            </t>
+            <t t-if="success">
+            <div class="alert alert-success" role="alert" t-esc="success"/>
+            </t>
+
+            <form t-attf-action="/student_management/admin/staff/edit/{{ staff.id }}" method="post" class="o_website_form">
+            <!-- ✅ CSRF token -->
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+            <!-- Update Staff Email -->
+            <div class="card mb-3">
+                <div class="card-body">
+                <h5 class="mb-3">Staff Information</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" t-att-value="staff.user_id.email"/>
+                    </div>
+                    <div class="col-md-6">
+                    <label class="form-label">Address</label>
+                    <input type="text" name="address" class="form-control" t-att-value="staff.address" />
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Update Staff</button>
+            </form>
         </t>
     </template>
 
+  
+<template id="manage_staff_template" name="Manage Staff">
+    <t t-call="odoo_student_management.portal_two_col_layout">
+        <t t-set="title">Manage Staff</t>
+        <h2>Staff List</h2>
+        <table class="table">
+            <thead>
+                <tr><th>Name</th><th>Email</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                <tr t-foreach="staffs" t-as="staff">
+                    <td t-esc="staff.name"/>
+                    <td t-esc="staff.email"/>
+                    <td><a t-attf-href="/student_management/admin/staff/edit/{{staff.id}}" class="btn btn-sm btn-primary">Edit</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </t>
+</template>
 
-    
 
 
 

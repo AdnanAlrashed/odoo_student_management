@@ -224,21 +224,25 @@ class StudentManagementAdminController(http.Controller):
                 })
             
             # Handle POST request
-            first_name = kwargs.get('first_name')
-            last_name = kwargs.get('last_name')
+            # تم إزالة first_name و last_name هنا لأنهما موجودان في user_id
             email = kwargs.get('email')
             address = kwargs.get('address')
-            
+
+            # تحقق من الحقول المطلوبة
+            if not email:
+                return request.render('odoo_student_management.edit_staff_template', {
+                    'staff': staff,
+                    'error': 'Email is required'
+                })
+
             try:
-                # Update user
+                # Update user (تحديث الـ user المرتبط بـ staff)
                 staff.user_id.sudo().write({
-                    'name': f"{first_name} {last_name}",
-                    'email': email,
+                    'email': email,  # تحديث البريد الإلكتروني فقط (إذا كان هذا الحقل موجود)
                 })
                 
-                # Update staff
+                # Update staff data (تحديث البيانات الخاصة بالموظف فقط مثل العنوان)
                 staff.sudo().write({
-                    'name': f"{first_name} {last_name}",
                     'email': email,
                     'address': address,
                 })
@@ -255,6 +259,20 @@ class StudentManagementAdminController(http.Controller):
                 })
         except AccessError:
             return request.redirect('/student_management/login')
+
+    @http.route('/student_management/admin/staff/manage', type='http', auth='user', website=True, methods=['GET'])
+    def manage_staff(self, **kwargs):
+        """Manage staff members"""
+        try:
+            self._check_admin_access()  # تأكد من صلاحيات المدير
+            staffs = request.env['student_management.staff'].sudo().search([])  # جلب الموظفين
+            return request.render('odoo_student_management.manage_staff_template', {
+                'staffs': staffs  # تم تمرير الموظفين للقالب
+            })
+        except AccessError:
+            return request.redirect('/student_management/login')  # في حالة عدم صلاحية الوصول، إعادة التوجيه
+
+
 
     # ==================== STUDENT MANAGEMENT ====================
 
