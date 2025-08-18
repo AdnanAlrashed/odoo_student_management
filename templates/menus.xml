@@ -3,7 +3,7 @@
     <!-- قائمة جانبية ديناميكية حسب المجموعة -->
     <template id="sidebar_menu" name="Sidebar Menu">
         <!-- قائمة المدير -->
-        <t t-if="request.env.user.has_group('odoo_student_management.group_student_management_admin')">
+         <t t-if="request.env.user.has_group('odoo_student_management.group_student_management_admin')">
             <a href="/student_management/admin/dashboard" class="list-group-item list-group-item-action">Dashboard</a>
             <div class="list-group-item"><strong>Staff</strong></div>
             <a href="/student_management/admin/staff/add" class="list-group-item list-group-item-action">Add Staff</a>
@@ -39,19 +39,40 @@
     </template>
 
     <!-- غلاف صفحات الموظف: عمود أيسر للسايدبار + عمود أيمن للمحتوى -->
-    <template id="staff_page_layout" name="Staff Page Layout">
-        <section class="container py-3">
-            <div class="row">
-                <aside class="col-12 col-md-3 mb-3 mb-md-0">
-                    <div class="list-group">
-                        <t t-call="odoo_student_management.sidebar_menu"/>
+    <template id="portal_two_col_layout" name="Portal Two-Column Layout">
+        <t t-call="website.layout">
+            <!-- CSS خارجي لهذه الصفحات فقط -->
+            <!-- <link rel="stylesheet" href="/odoo_student_management/static/src/css/staff_dashboard.css"/> -->
+
+            <div id="wrap" class="sms-staff-page">
+                <section class="container py-3">
+                    <div class="row">
+                        <aside class="col-12 col-md-3 mb-3 mb-md-0">
+                        <div class="list-group">
+                            <!-- السايدبار الذكي: يعرض عناصر بحسب مجموعة المستخدم -->
+                            <t t-call="odoo_student_management.sidebar_menu"/>
+                        </div>
+                        </aside>
+
+                        <main class="col-12 col-md-9">
+                        <!-- هنا يتم حقن محتوى الصفحة الذي تحدده من القالب المستدعي -->
+                        <t t-raw="0"/>
+                        </main>
                     </div>
-                </aside>
-                <main class="col-12 col-md-9">
-                    <!-- هنا نَعرض محتوى الداشبورد الأصلي -->
-                    <t t-call="odoo_student_management.staff_dashboard_template"/>
-                </main>
+                </section>
+                <!-- تذييل عام للبوابة -->
+                <div class="sms-staff-footer">
+                    <div class="container footer-inner">
+                        <div>© <t t-esc="request.website.name"/> — Portal</div>
+                        <!-- خروج عام يعيدك لتسجيل الدخول ثم يفرزك عبر check_user_type -->
+                        <div>
+                            <a t-att-href="'/web/session/logout?redirect=/student_management/check_user_type&amp;db=' + request.env.cr.dbname">
+                                <i class="fa fa-sign-out me-1"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </section>
+        </t>
     </template>
 </odoo>

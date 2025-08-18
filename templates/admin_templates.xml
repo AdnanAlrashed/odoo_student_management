@@ -1,30 +1,369 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- لوحة تحكم المدير -->
+    <!-- Admin Dashboard -->
     <template id="admin_dashboard_template" name="Admin Dashboard">
-        <t t-call="odoo_student_management.layout">
+        <t t-call="odoo_student_management.portal_two_col_layout">
             <t t-set="title">Admin Dashboard</t>
-            <h1>Welcome, Admin!</h1>
-            <p>This is your dashboard. You can manage students, staff, courses, and subjects from here.</p>
-            <!-- يمكنك إضافة إحصائيات ومخططات بيانية هنا باستخدام JavaScript -->
+
+            <!-- Welcome -->
+            <div class="mb-4">
+                <h1 class="h2 text-primary mb-2">Welcome, Admin!</h1>
+                <p class="text-muted">Main control panel for managing the education system</p>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="row mb-4">
+                <!-- Total Students -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas fa-user-graduate text-primary fa-2x"></i>
+                                </div>
+                            </div>
+                            <h3 class="h4 mb-1 text-primary" t-esc="total_students or '0'">0</h3>
+                            <p class="text-muted mb-0 small">Total Students</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Staff -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas fa-chalkboard-teacher text-success fa-2x"></i>
+                                </div>
+                            </div>
+                            <h3 class="h4 mb-1 text-success" t-esc="total_staff or '0'">0</h3>
+                            <p class="text-muted mb-0 small">Total Staff</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Courses -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas fa-book text-info fa-2x"></i>
+                                </div>
+                            </div>
+                            <h3 class="h4 mb-1 text-info" t-esc="total_courses or '0'">0</h3>
+                            <p class="text-muted mb-0 small">Total Courses</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Subjects -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas fa-clipboard-list text-warning fa-2x"></i>
+                                </div>
+                            </div>
+                            <h3 class="h4 mb-1 text-warning" t-esc="total_subjects or '0'">0</h3>
+                            <p class="text-muted mb-0 small">Total Subjects</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 pb-0">
+                            <h5 class="card-title mb-0">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Add New Student -->
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <a href="/student_management/admin/student/add" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3 text-decoration-none">
+                                        <i class="fas fa-user-plus fa-2x mb-2"></i>
+                                        <span>Add New Student</span>
+                                    </a>
+                                </div>
+
+                                <!-- Add New Staff -->
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <a href="/student_management/admin/staff/add" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3 text-decoration-none">
+                                        <i class="fas fa-user-tie fa-2x mb-2"></i>
+                                        <span>Add New Staff Member</span>
+                                    </a>
+                                </div>
+
+                                <!-- Add New Course -->
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <a href="/student_management/admin/course/add" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3 text-decoration-none">
+                                        <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                                        <span>Add New Course</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity & Quick Reports -->
+            <div class="row">
+                <!-- Recent Activity -->
+                <div class="col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-white border-0 pb-0">
+                            <h5 class="card-title mb-0">Recent Activity</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-user-plus text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <p class="mb-0 small">A new student was added</p>
+                                            <small class="text-muted">2 hours ago</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-check text-success"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <p class="mb-0 small">Staff record updated</p>
+                                            <small class="text-muted">4 hours ago</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-book text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <p class="mb-0 small">New course created</p>
+                                            <small class="text-muted">Yesterday</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Reports -->
+                <div class="col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-white border-0 pb-0">
+                            <h5 class="card-title mb-0">Quick Reports</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <a href="/student_management/admin/reports/students" class="list-group-item list-group-item-action border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-chart-bar text-primary me-3"></i>
+                                        <span>Students Report</span>
+                                    </div>
+                                </a>
+                                <a href="/student_management/admin/reports/attendance" class="list-group-item list-group-item-action border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-calendar-check text-success me-3"></i>
+                                        <span>Attendance Report</span>
+                                    </div>
+                                </a>
+                                <a href="/student_management/admin/reports/performance" class="list-group-item list-group-item-action border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-chart-line text-info me-3"></i>
+                                        <span>Performance Report</span>
+                                    </div>
+                                </a>
+                                <a href="/student_management/admin/reports/financial" class="list-group-item list-group-item-action border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-dollar-sign text-warning me-3"></i>
+                                        <span>Financial Report</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+            <!-- Extra KPIs -->
+            <div class="row mb-4">
+            <!-- Pending Staff Leaves -->
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                        <i class="fas fa-user-check text-warning fa-2x"></i>
+                    </div>
+                    </div>
+                    <h3 class="h4 mb-1 text-warning" t-esc="pending_staff_leaves or '0'">0</h3>
+                    <p class="text-muted mb-0 small">Pending Staff Leaves</p>
+                </div>
+                </div>
+            </div>
+
+            <!-- Pending Student Leaves -->
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                        <i class="fas fa-user-clock text-danger fa-2x"></i>
+                    </div>
+                    </div>
+                    <h3 class="h4 mb-1 text-danger" t-esc="pending_student_leaves or '0'">0</h3>
+                    <p class="text-muted mb-0 small">Pending Student Leaves</p>
+                </div>
+                </div>
+            </div>
+
+            <!-- Total Sessions -->
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="bg-secondary bg-opacity-10 rounded-circle p-3">
+                        <i class="fas fa-calendar-alt text-secondary fa-2x"></i>
+                    </div>
+                    </div>
+                    <h3 class="h4 mb-1 text-secondary" t-esc="total_sessions or '0'">0</h3>
+                    <p class="text-muted mb-0 small">Total Sessions</p>
+                </div>
+                </div>
+            </div>
+
+            <!-- Total Attendance Records -->
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                        <i class="fas fa-list-check text-info fa-2x"></i>
+                    </div>
+                    </div>
+                    <h3 class="h4 mb-1 text-info" t-esc="total_attendance or '0'">0</h3>
+                    <p class="text-muted mb-0 small">Total Attendance</p>
+                </div>
+                </div>
+            </div>
+            </div>
+
+            
+
+            <!-- Font Awesome (icons) -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+            <!-- Page CSS tweaks -->
+            <style>
+                .card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+                .card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; }
+                .btn-outline-primary:hover,
+                .btn-outline-success:hover,
+                .btn-outline-info:hover { transform: translateY(-1px); transition: all 0.2s ease-in-out; }
+                .list-group-item-action:hover { background-color: rgba(0,0,0,0.02); }
+            </style>
         </t>
     </template>
 
-    <!-- إضافة موظف -->
+    <!-- Add Staff -->
     <template id="add_staff_template" name="Add Staff">
-        <t t-call="odoo_student_management.layout">
+        <t t-call="odoo_student_management.portal_two_col_layout">
             <t t-set="title">Add Staff</t>
-            <h2>Add New Staff Member</h2>
-            <form action="/student_management/admin/staff/add" method="post">
-                <!-- ... حقول النموذج لإضافة موظف ... -->
-                <button type="submit" class="btn btn-primary">Add Staff</button>
+
+            <t t-if="error">
+            <div class="alert alert-danger" role="alert" t-esc="error"/>
+            </t>
+            <t t-if="success">
+            <div class="alert alert-success" role="alert" t-esc="success"/>
+            </t>
+
+            <form action="/student_management/admin/staff/add" method="post" class="o_website_form">
+            <!-- ✅ CSRF ضروري -->
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+            <!-- اختيار مستخدم موجود -->
+            <div class="card mb-3">
+                <div class="card-body">
+                <h5 class="mb-3">Link Existing User</h5>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                    <label class="form-label">Select User</label>
+                    <select name="user_id" class="form-select">
+                        <option value="">-- Choose existing user --</option>
+                        <t t-foreach="available_users or []" t-as="u">
+                        <option t-att-value="u.id">
+                            <t t-esc="u.name"/> (<t t-esc="u.login"/>)
+                        </option>
+                        </t>
+                    </select>
+                    <small class="text-muted">Users already linked to active staff are excluded.</small>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="text-center my-2">— OR —</div>
+
+            <!-- إنشاء مستخدم جديد -->
+            <div class="card mb-3">
+                <div class="card-body">
+                <h5 class="mb-3">Create New User</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control"/>
+                    </div>
+                    <div class="col-md-4">
+                    <label class="form-label">Email (Login)</label>
+                    <input type="email" name="email" class="form-control"/>
+                    </div>
+                    <div class="col-md-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control"/>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- بيانات الموظف الإضافية (اختياري) -->
+            <div class="card mb-3">
+                <div class="card-body">
+                <h5 class="mb-3">Staff Info</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                    <label class="form-label">Employee ID</label>
+                    <input type="text" name="employee_id" class="form-control"/>
+                    </div>
+                    <div class="col-md-8">
+                    <label class="form-label">Address</label>
+                    <input type="text" name="address" class="form-control"/>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Staff</button>
             </form>
         </t>
     </template>
 
-    <!-- إدارة الموظفين -->
+    <!-- Manage Staff -->
     <template id="manage_staff_template" name="Manage Staff">
-        <t t-call="odoo_student_management.layout">
+        <t t-call="odoo_student_management.portal_two_col_layout">
             <t t-set="title">Manage Staff</t>
             <h2>Staff List</h2>
             <table class="table">
@@ -41,6 +380,11 @@
             </table>
         </t>
     </template>
+
+
     
-    <!-- يمكنك إضافة قوالب أخرى هنا (إضافة طالب، إدارة الدورات، إلخ) بنفس النمط -->
+
+
+
+
 </odoo>
