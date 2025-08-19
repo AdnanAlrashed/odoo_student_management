@@ -73,6 +73,7 @@
         'templates/layout.xml',
         'templates/admin_templates.xml',
         'templates/staff_dashboard_template.xml',
+        'templates/edit_staff_template.xml',
         'templates/student_templates.xml',
 
         'reports/attendance_report.xml'

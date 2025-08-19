@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import logging
 import base64
@@ -219,46 +218,40 @@ class StudentManagementAdminController(http.Controller):
                 return request.redirect('/student_management/admin/staff/manage')
             
             if request.httprequest.method == 'GET':
-                return request.render('odoo_student_management.edit_staff_template', {
+                return request.render('odoo_student_management.edit_staff_simple_template', {
                     'staff': staff
                 })
             
             # Handle POST request
-            # تم إزالة first_name و last_name هنا لأنهما موجودان في user_id
             email = kwargs.get('email')
             address = kwargs.get('address')
-
-            # تحقق من الحقول المطلوبة
-            if not email:
-                return request.render('odoo_student_management.edit_staff_template', {
-                    'staff': staff,
-                    'error': 'Email is required'
-                })
+            phone = kwargs.get('phone')
 
             try:
-                # Update user (تحديث الـ user المرتبط بـ staff)
+                # Update user
                 staff.user_id.sudo().write({
-                    'email': email,  # تحديث البريد الإلكتروني فقط (إذا كان هذا الحقل موجود)
-                })
-                
-                # Update staff data (تحديث البيانات الخاصة بالموظف فقط مثل العنوان)
-                staff.sudo().write({
                     'email': email,
-                    'address': address,
+                    'phone': phone or False,
                 })
                 
-                return request.render('odoo_student_management.edit_staff_template', {
-                    'staff': staff,
-                    'success': 'Staff member updated successfully'
+                # Update staff
+                staff.sudo().write({
+                    'address': address or False,
                 })
+                
+                # إرجاع رد JavaScript لإغلاق النافذة وتحديث الصفحة
+                return "OK"
+                    
             except Exception as e:
                 _logger.error(f"Error updating staff: {str(e)}")
-                return request.render('odoo_student_management.edit_staff_template', {
+                return request.render('odoo_student_management.edit_staff_simple_template', {
                     'staff': staff,
-                    'error': 'Failed to update staff member'
+                    'error': 'Failed to update staff member. Please try again.'
                 })
+                
         except AccessError:
             return request.redirect('/student_management/login')
+
 
     @http.route('/student_management/admin/staff/manage', type='http', auth='user', website=True, methods=['GET'])
     def manage_staff(self, **kwargs):
@@ -358,6 +351,7 @@ class StudentManagementAdminController(http.Controller):
                 })
         except AccessError:
             return request.redirect('/student_management/login')
+
 
     @http.route('/student_management/admin/student/manage', type='http', auth='user', methods=['GET'])
     def manage_student(self, **kwargs):
