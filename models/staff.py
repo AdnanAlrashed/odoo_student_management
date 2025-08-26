@@ -87,19 +87,19 @@ class Staff(models.Model):
         index=True
     )
     leave_count = fields.Integer(
-        string='Leave Requests',
+        string='Leave Requests Count',
         compute='_compute_leave_count',
         store=True,
         index=True
     )
     feedback_count = fields.Integer(
-        string='Feedback Messages',
+        string='Feedback Messages Count',
         compute='_compute_feedback_count',
         store=True,
         index=True
     )
     notification_count = fields.Integer(
-        string='Notifications',
+        string='Notifications Count',
         compute='_compute_notification_count',
         store=True,
         index=True

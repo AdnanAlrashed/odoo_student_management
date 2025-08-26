@@ -99,15 +99,15 @@ class Student(models.Model):
         store=True
     )
     leave_count = fields.Integer(
-        string='Leave Requests',
+        string='Leave Requests Count',
         compute='_compute_leave_count'
     )
     feedback_count = fields.Integer(
-        string='Feedback Messages',
+        string='Feedback Messages Count',
         compute='_compute_feedback_count'
     )
     notification_count = fields.Integer(
-        string='Notifications',
+        string='Notifications Count',
         compute='_compute_notification_count'
     )
     result_count = fields.Integer(
@@ -141,13 +141,21 @@ class Student(models.Model):
         'student_id',
         string='Academic Results'
     )
-    subject_ids = fields.One2many(
-        'student_management.subject',
-        'course_id',
-        string='Subjects',
-        compute='_compute_subject_ids',
-    )
+    # subject_ids = fields.One2many(
+    #     'student_management.subject',
+    #     'course_id',
+    #     string='Subjects',
+    #     compute='_compute_subject_ids',
+    # )
 
+    subject_ids = fields.Many2many(
+    'student_management.subject',
+    'subject_student_rel',  # نفس اسم الجدول الوسيط المستخدم في نموذج المادة
+    'student_id',
+    'subject_id',
+    string='Subjects',
+    readonly=True, # اجعله للقراءة فقط لأنه يتم تحديثه تلقائياً
+    )
     # Computed fields
     subject_count = fields.Integer(
         string='Subject Count',
@@ -217,28 +225,67 @@ class Student(models.Model):
                     "Current semester must be greater than 0."
                     )
 
+    # @api.model_create_multi
+    # def create(self, vals_list):
+    #     """Override create to ensure users are assigned to student group"""
+    #     students = super().create(vals_list)
+    #     student_group = self.env.ref('odoo_student_management.group_student_management_student', raise_if_not_found=False)
+    #     if student_group:
+    #         user_ids = [s.user_id.id for s in students if s.user_id]
+    #         if user_ids:
+    #             student_group.users = [(4, uid) for uid in user_ids]
+    #     return students
+
+
+    # def write(self, vals):
+    #     """Override write to handle user group changes"""
+    #     result = super().write(vals)
+    #     if 'user_id' in vals:
+    #         for student in self:
+    #             if student.user_id:
+    #                 # Add user to student group
+    #                 student_group = self.env.ref('odoo_student_management.group_student_management_student', raise_if_not_found=False)
+    #                 if student_group:
+    #                     student_group.users = [(4, student.user_id.id)]
+    #     return result
+
     @api.model_create_multi
     def create(self, vals_list):
-        """Override create to ensure users are assigned to student group"""
         students = super().create(vals_list)
-        student_group = self.env.ref('odoo_student_management.group_student_management_student', raise_if_not_found=False)
-        if student_group:
-            user_ids = [s.user_id.id for s in students if s.user_id]
-            if user_ids:
-                student_group.users = [(4, uid) for uid in user_ids]
+        for student in students:
+            if student.course_id:
+                # البحث عن جميع المواد المرتبطة بالدورة
+                subjects = self.env['student_management.subject'].search([
+                    ('course_id', '=', student.course_id.id)
+                ])
+                # ربط الطالب بجميع هذه المواد
+                if subjects:
+                    student.write({'subject_ids': [(6, 0, subjects.ids)]})
         return students
 
     def write(self, vals):
-        """Override write to handle user group changes"""
+        # إذا تم تغيير الدورة، قم بتحديث المواد المرتبطة بالطالب
+        if 'course_id' in vals:
+            subjects = self.env['student_management.subject'].search([
+                ('course_id', '=', vals['course_id'])
+            ])
+            if subjects:
+                vals['subject_ids'] = [(6, 0, subjects.ids)]
+                
         result = super().write(vals)
-        if 'user_id' in vals:
-            for student in self:
-                if student.user_id:
-                    # Add user to student group
-                    student_group = self.env.ref('odoo_student_management.group_student_management_student', raise_if_not_found=False)
-                    if student_group:
-                        student_group.users = [(4, student.user_id.id)]
         return result
+
+    # يجب أيضاً تعديل الحقل المحسوب للمواد ليعتمد على الدورة
+    @api.depends('course_id')
+    def _compute_subject_ids(self):
+        for record in self:
+            if record.course_id:
+                record.subject_ids = self.env['student_management.subject'].search([
+                    ('course_id', '=', record.course_id.id)
+                ])
+            else:
+                record.subject_ids = False
+
 
     def action_view_attendance(self):
         """Action to view attendance records of this student"""
@@ -333,11 +380,11 @@ class Student(models.Model):
             return students.name_get()
         return super().name_search(name, args, operator, limit)
 
-    def _compute_subject_ids(self):
-        for record in self:
-            record.subject_ids = self.env['student_management.subject'].search([
-                ('course_id', '=', record.course_id.id)
-            ])
+    # def _compute_subject_ids(self):
+    #     for record in self:
+    #         record.subject_ids = self.env['student_management.subject'].search([
+    #             ('course_id', '=', record.course_id.id)
+    #         ])
 
     def _compute_subject_count(self):
         for record in self:

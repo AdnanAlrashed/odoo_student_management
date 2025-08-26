@@ -23,12 +23,12 @@
             <field name="arch" type="xml">
                 <form string="Student Feedback">
                     <header>
-                        <button name="mark_as_replied" type="object" string="Mark as Replied" 
+                        <button name="action_reply" type="object" string="Mark as Replied" 
                                 class="btn-primary" invisible="[('is_replied', '=', True)]"
-                                groups="group_student_management_admin"/>
-                        <button name="mark_as_replied" type="object" string="Mark as Unreplied" 
+                                groups="odoo_student_management.group_student_management_admin"/>
+                        <button name="action_mark_as_replied" type="object" string="Mark as Unreplied" 
                                 class="btn-secondary" invisible="[('is_replied', '=', False)]"
-                                groups="group_student_management_admin"/>
+                                groups="odoo_student_management.group_student_management_admin"/>
                         <field name="is_replied" statusbar_visible="False,True"/>
                     </header>
                     <sheet>
@@ -109,10 +109,10 @@
                     <header>
                         <button name="action_reply" type="object" string="Mark as Replied" 
                                 class="btn-primary" invisible="[('is_replied', '=', True)]"
-                                groups="group_student_management_admin"/>
-                        <button name="mark_as_replied" type="object" string="Mark as Unreplied" 
+                                groups="odoo_student_management.group_student_management_admin"/>
+                        <button name="action_mark_as_replied" type="object" string="Mark as Unreplied" 
                                 class="btn-secondary" invisible="[('is_replied', '=', False)]"
-                                groups="group_student_management_admin"/>
+                                groups="odoo_student_management.group_student_management_admin"/>
                         <field name="is_replied" statusbar_visible="False,True"/>
                     </header>
                     <sheet>

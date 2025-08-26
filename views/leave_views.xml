@@ -29,13 +29,13 @@
                     <header>
                         <button name="action_approve" type="object" string="Approve" 
                                 class="btn-success" invisible="[('leave_status', '!=', 'pending')]"
-                                groups="group_student_management_admin"/>
+                                groups="odoo_student_management.group_student_management_admin"/>
                         <button name="action_reject" type="object" string="Reject" 
                                 class="btn-danger" invisible="[('leave_status', '!=', 'pending')]"
-                                groups="group_student_management_admin"/>
+                                groups="odoo_student_management.group_student_management_admin"/>
                         <button name="action_reset_to_pending" type="object" string="Reset to Pending" 
                                 class="btn-secondary" invisible="[('leave_status', '=', 'pending')]"
-                                groups="group_student_management_admin"/>
+                                groups="odoo_student_management.group_student_management_admin"/>
                         <field name="leave_status" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
                     </header>
                     <sheet>
@@ -128,13 +128,13 @@
                     <header>
                         <button name="action_approve" type="object" string="Approve" 
                                 class="btn-success" invisible="[('leave_status', '!=', 'pending')]"
-                                groups="group_student_management_admin"/>
+                                groups="odoo_student_management.group_student_management_admin"/>
                         <button name="action_reject" type="object" string="Reject" 
                                 class="btn-danger" invisible="[('leave_status', '!=', 'pending')]"
-                                groups="group_student_management_admin"/>
+                                groups="odoo_student_management.group_student_management_admin"/>
                         <button name="action_reset_to_pending" type="object" string="Reset to Pending" 
                                 class="btn-secondary" invisible="[('leave_status', '=', 'pending')]"
-                                groups="group_student_management_admin"/>
+                                groups="odoo_student_management.group_student_management_admin"/>
                         <field name="leave_status" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
                     </header>
                     <sheet>

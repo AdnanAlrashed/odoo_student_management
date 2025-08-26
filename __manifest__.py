@@ -1,9 +1,9 @@
 {
-    'name': 'Student Management System (Django Port)',
+    'name': 'Student Management System',
     'icon': '/odoo_student_management/static/img/academy.png',
     'version': '18.0.1.0.1',
     'category': 'Education',
-    'summary': 'Complete Student Management System ported from Django to Odoo 18',
+    'summary': 'Complete Student Management System ',
     'description': """
         Student Management System - Django Port to Odoo 18
         ==================================================
@@ -34,9 +34,8 @@
         This module maintains the same data structure and business logic as the original
         Django application while leveraging Odoo's powerful framework features.
     """,
-    'author': 'Manus AI',
-    'website': 'https://manus.ai',
-    'license': 'LGPL-3',
+    'author': 'Adnan Alrashed',
+    'website': 'https://ittech-ye.net',
     'depends': ['base', 'web', 'mail', 'documents', 'website'],
     'data': [
         # Security
@@ -88,5 +87,6 @@
     'installable': True,
     'auto_install': False,
     'application': True,
+    'license':'LGPL-3',
     'sequence': 10,
 }

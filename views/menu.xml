@@ -55,7 +55,7 @@
                   parent="menu_user_management"
                   action="action_student"
                   sequence="20"
-                  groups="group_student_management_student"/>
+                  />
 
         <!-- Attendance Management -->
         <menuitem id="menu_attendance_management"
@@ -150,6 +150,14 @@
                   action="action_staff_my_subjects"
                   sequence="10"/>
 
+        <menuitem id="menu_staff_view_students"
+          name="My Students"
+          parent="menu_staff_my_work"
+          action="action_student"
+          sequence="20"
+          groups="group_student_management_staff"/>
+
+
         <!-- <menuitem id="menu_staff_take_attendance"
                   name="Take Attendance"
                   parent="menu_staff_my_work"
@@ -235,10 +243,10 @@
             action="action_server_show_my_courses"
             sequence="10"/> -->
 
-        <menuitem id="menu_student_my_courses"
-                  name="My Courses"
+        <menuitem id="menu_student_my_subjects"
+                  name="My Subjects"
                   parent="menu_student_academic"
-                  action="action_server_show_my_courses"
+                  action="action_server_show_my_subjects"
                   sequence="30"/>
 
         <!-- Student - Personal -->

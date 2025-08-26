@@ -59,13 +59,13 @@
 
                     <t t-if="error">
                         <div class="alert alert-error">
-                            <t t-esc="error"/>
+                            <t t-out="error"/>
                         </div>
                     </t>
 
                     <t t-if="success">
                         <div class="alert alert-success">
-                            <t t-esc="success"/>
+                            <t t-out="success"/>
                         </div>
                     </t>
 
@@ -84,7 +84,7 @@
 
                         <div class="form-group">
                             <label>Address:</label>
-                            <textarea name="address" rows="3"><t t-esc="staff.address"/></textarea>
+                            <textarea name="address" rows="3"><t t-out="staff.address"/></textarea>
                         </div>
 
                         <div class="form-group">

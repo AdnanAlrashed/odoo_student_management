@@ -22,7 +22,7 @@
                                     <i class="fas fa-user-graduate text-primary fa-2x"></i>
                                 </div>
                             </div>
-                            <h3 class="h4 mb-1 text-primary" t-esc="total_students or '0'">0</h3>
+                            <h3 class="h4 mb-1 text-primary" t-out="total_students or '0'">0</h3>
                             <p class="text-muted mb-0 small">Total Students</p>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                                     <i class="fas fa-chalkboard-teacher text-success fa-2x"></i>
                                 </div>
                             </div>
-                            <h3 class="h4 mb-1 text-success" t-esc="total_staff or '0'">0</h3>
+                            <h3 class="h4 mb-1 text-success" t-out="total_staff or '0'">0</h3>
                             <p class="text-muted mb-0 small">Total Staff</p>
                         </div>
                     </div>
@@ -52,7 +52,7 @@
                                     <i class="fas fa-book text-info fa-2x"></i>
                                 </div>
                             </div>
-                            <h3 class="h4 mb-1 text-info" t-esc="total_courses or '0'">0</h3>
+                            <h3 class="h4 mb-1 text-info" t-out="total_courses or '0'">0</h3>
                             <p class="text-muted mb-0 small">Total Courses</p>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                                     <i class="fas fa-clipboard-list text-warning fa-2x"></i>
                                 </div>
                             </div>
-                            <h3 class="h4 mb-1 text-warning" t-esc="total_subjects or '0'">0</h3>
+                            <h3 class="h4 mb-1 text-warning" t-out="total_subjects or '0'">0</h3>
                             <p class="text-muted mb-0 small">Total Subjects</p>
                         </div>
                     </div>
@@ -210,7 +210,7 @@
                         <i class="fas fa-user-check text-warning fa-2x"></i>
                     </div>
                     </div>
-                    <h3 class="h4 mb-1 text-warning" t-esc="pending_staff_leaves or '0'">0</h3>
+                    <h3 class="h4 mb-1 text-warning" t-out="pending_staff_leaves or '0'">0</h3>
                     <p class="text-muted mb-0 small">Pending Staff Leaves</p>
                 </div>
                 </div>
@@ -225,7 +225,7 @@
                         <i class="fas fa-user-clock text-danger fa-2x"></i>
                     </div>
                     </div>
-                    <h3 class="h4 mb-1 text-danger" t-esc="pending_student_leaves or '0'">0</h3>
+                    <h3 class="h4 mb-1 text-danger" t-out="pending_student_leaves or '0'">0</h3>
                     <p class="text-muted mb-0 small">Pending Student Leaves</p>
                 </div>
                 </div>
@@ -240,7 +240,7 @@
                         <i class="fas fa-calendar-alt text-secondary fa-2x"></i>
                     </div>
                     </div>
-                    <h3 class="h4 mb-1 text-secondary" t-esc="total_sessions or '0'">0</h3>
+                    <h3 class="h4 mb-1 text-secondary" t-out="total_sessions or '0'">0</h3>
                     <p class="text-muted mb-0 small">Total Sessions</p>
                 </div>
                 </div>
@@ -255,7 +255,7 @@
                         <i class="fas fa-list-check text-info fa-2x"></i>
                     </div>
                     </div>
-                    <h3 class="h4 mb-1 text-info" t-esc="total_attendance or '0'">0</h3>
+                    <h3 class="h4 mb-1 text-info" t-out="total_attendance or '0'">0</h3>
                     <p class="text-muted mb-0 small">Total Attendance</p>
                 </div>
                 </div>
@@ -285,10 +285,10 @@
             <t t-set="title">Add Staff</t>
 
             <t t-if="error">
-            <div class="alert alert-danger" role="alert" t-esc="error"/>
+            <div class="alert alert-danger" role="alert" t-out="error"/>
             </t>
             <t t-if="success">
-            <div class="alert alert-success" role="alert" t-esc="success"/>
+            <div class="alert alert-success" role="alert" t-out="success"/>
             </t>
 
             <form action="/student_management/admin/staff/add" method="post" class="o_website_form">
@@ -306,7 +306,7 @@
                         <option value="">-- Choose existing user --</option>
                         <t t-foreach="available_users or []" t-as="u">
                         <option t-att-value="u.id">
-                            <t t-esc="u.name"/> (<t t-esc="u.login"/>)
+                            <t t-out="u.name"/> (<t t-out="u.login"/>)
                         </option>
                         </t>
                     </select>
@@ -369,10 +369,10 @@
             <h2>Edit Staff Member</h2>
 
             <t t-if="error">
-            <div class="alert alert-danger" role="alert" t-esc="error"/>
+            <div class="alert alert-danger" role="alert" t-out="error"/>
             </t>
             <t t-if="success">
-            <div class="alert alert-success" role="alert" t-esc="success"/>
+            <div class="alert alert-success" role="alert" t-out="success"/>
             </t>
 
             <form t-attf-action="/student_management/admin/staff/edit/{{ staff.id }}" method="post" class="o_website_form">
@@ -431,11 +431,11 @@
                 </thead>
                 <tbody>
                     <tr t-foreach="staffs" t-as="staff">
-                        <td t-esc="staff.name"/>
-                        <td t-esc="staff.address"/>
-                        <td t-esc="staff.gender"/>
-                        <td t-esc="staff.user_id.phone"/>
-                        <td t-esc="staff.user_id.email"/>
+                        <td t-out="staff.name"/>
+                        <td t-out="staff.address"/>
+                        <td t-out="staff.gender"/>
+                        <td t-out="staff.user_id.phone"/>
+                        <td t-out="staff.user_id.email"/>
                         <td>
                             <button class="btn btn-sm btn-primary" t-att-onclick="'openEditModal(\'' + str(staff.id) + '\')'">
                                 Edit

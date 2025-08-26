@@ -63,11 +63,11 @@ class Subject(models.Model):
     
     # Related fields for statistics
     attendance_count = fields.Integer(
-        string='Attendance Records',
+        string='Attendance Record Count',
         compute='_compute_attendance_count'
     )
     result_count = fields.Integer(
-        string='Student Results',
+        string='Student Results Count',
         compute='_compute_result_count'
     )
     

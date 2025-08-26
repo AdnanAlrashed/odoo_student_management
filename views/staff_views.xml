@@ -35,7 +35,7 @@
                         <field name="active" statusbar_visible="active"/>
                     </header>
                     <sheet>
-                        <div class="alert alert-warning" invisible="[('phone','!=',False),('gender','!=',False),('address','!=',False)]">
+                        <div class="alert alert-warning"  role="alert" invisible="[('phone','!=',False),('gender','!=',False),('address','!=',False)]">
                             <strong>Warning!</strong> Please complete your profile information.
                         </div>
                         <field name="profile_pic" widget="image" class="oe_avatar" options="{'preview_image': 'profile_pic', 'size': [90, 90]}"/>

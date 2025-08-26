@@ -37,7 +37,7 @@
                         class="oe_stat_button"
                         icon="fa-book"
                         string="My Subjects"
-                        groups="group_student_management_student">
+                        groups="odoo_student_management.group_student_management_student">
                         <!-- لا نحتاج لعرض عدد المواد هنا للطالب -->
                     </button>
                 </div>

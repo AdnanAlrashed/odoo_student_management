@@ -92,21 +92,24 @@ class SessionYear(models.Model):
     def _check_overlapping_sessions(self):
         for record in self:
             if record.session_start_year and record.session_end_year:
-                # Allow same year if explicitly needed
-                if record.session_start_year.year == record.session_end_year.year:
-                    continue
-                    
+                # النطاق الصحيح
                 overlapping = self.search([
+                    # الشرط الأول: لا تقارن السجل بنفسه
                     ('id', '!=', record.id),
-                    '|',
-                    '&', ('session_start_year', '<', record.session_end_year),
-                         ('session_end_year', '>', record.session_start_year),
+                    
+                    # الشرط الثاني: ابحث عن أي سجل يتداخل مع تواريخ السجل الحالي
+                    # المنطق: (start_date_1 < end_date_2) AND (end_date_1 > start_date_2)
+                    ('session_start_year', '<', record.session_end_year),
+                    ('session_end_year', '>', record.session_start_year),
                 ])
+                
                 if overlapping:
                     raise ValidationError(
                         f"Session years cannot overlap with existing session: {overlapping[0].display_name}"
                     )
 
+    
+    
     def name_get(self):
         result = []
         for record in self:

@@ -102,14 +102,23 @@ class FeedbackStudent(models.Model):
             },
         }
 
-    def mark_as_replied(self, reply_message):
-        """Mark feedback as replied with the given message"""
-        self.write({
-            'feedback_reply': reply_message,
-            'is_replied': True,
-            'replied_by': self.env.user.id,
-            'reply_date': fields.Datetime.now()
-        })
+    def action_mark_as_replied(self):
+        """
+        Wrapper method to be called from a button.
+        This method calls the original 'mark_as_replied' with a default message.
+        """
+        # نستخدم ensure_one() للتأكد من أننا نعمل على سجل واحد فقط في كل مرة يتم الضغط على الزر.
+        self.ensure_one()
+        
+        # يمكنك تخصيص رسالة الرد الافتراضية هنا
+        default_reply_message = "تم الرد على رسالتك من قبل الإدارة."
+        
+        # استدعاء الدالة الأصلية مع المعامل المطلوب
+        self.mark_as_replied(reply_message=default_reply_message)
+        
+        # إرجاع True للإشارة إلى أن العملية تمت بنجاح
+        return True
+
 
     def mark_as_pending(self):
         """Mark feedback as pending (remove reply)"""
@@ -206,14 +215,21 @@ class FeedbackStaff(models.Model):
             },
         }
 
-    def mark_as_replied(self, reply_message):
-        """Mark feedback as replied with the given message"""
-        self.write({
-            'feedback_reply': reply_message,
-            'is_replied': True,
-            'replied_by': self.env.user.id,
-            'reply_date': fields.Datetime.now()
-        })
+    def action_mark_as_replied(self):
+        """
+        Wrapper method to be called from a button.
+        This method calls the original 'mark_as_replied' with a default message.
+        """
+        # التأكد من أننا نعمل على سجل واحد فقط
+        self.ensure_one()
+        
+        # رسالة رد افتراضية للموظفين
+        default_reply_message = "تم استلام رسالتك والرد عليها."
+        
+        # استدعاء الدالة الأصلية مع المعامل المطلوب
+        self.mark_as_replied(reply_message=default_reply_message)
+        
+        return True
 
     def mark_as_pending(self):
         """Mark feedback as pending (remove reply)"""
