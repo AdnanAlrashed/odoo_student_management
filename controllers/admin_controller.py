@@ -14,6 +14,7 @@ class StudentManagementAdminController(http.Controller):
     # ===== ثوابت المجموعات =====
     ADMIN_GROUP = 'odoo_student_management.group_student_management_admin'
     STAFF_GROUP = 'odoo_student_management.group_student_management_staff'
+    STUDENT_GROUP = 'odoo_student_management.group_student_management_student'
 
     def _check_admin_access(self):
         """Check if current user has admin access"""
@@ -114,98 +115,104 @@ class StudentManagementAdminController(http.Controller):
 
     # ==================== STAFF MANAGEMENT ====================
 
-    @http.route('/student_management/admin/staff/add', type='http', auth='user', website=True, methods=['GET', 'POST'])
+    @http.route('/student_management/admin/staff/add', type='http', auth='user', website=True, methods=['GET', 'POST'] )
     def add_staff(self, **kwargs):
-        """Add new staff member (link existing user OR create new)"""
+        """Add new staff member (link existing user OR create new) - Enhanced Version"""
         try:
             self._check_admin_access()
             Staff = request.env['student_management.staff'].sudo()
             Users = request.env['res.users'].sudo()
 
-            # مجموعة الموظفين
+            # جلب مجموعة الموظفين
             try:
                 staff_group = request.env.ref(self.STAFF_GROUP)
-            except Exception:
+            except Exception as e:
+                _logger.error("Could not find staff group '%s': %s", self.STAFF_GROUP, e)
                 staff_group = None
 
+            # ===== معالجة طلب GET (عرض النموذج) =====
             if request.httprequest.method == 'GET':
-                # اعرض فقط المستخدمين الفعّالين غير المرتبطين بموظف نشط
-                existing_user_ids = Staff.search([('active', '=', True)]).mapped('user_id').ids
-                available_users = Users.search([
+                # جلب المستخدمين الذين لديهم صلاحية موظف وغير مرتبطين بملف موظف آخر
+                existing_staff_user_ids = Staff.search([('active', '=', True )]).mapped('user_id').ids
+                
+                domain = [
                     ('active', '=', True),
-                    ('id', 'not in', existing_user_ids),
-                ])
+                    ('id', 'not in', existing_staff_user_ids),
+                ]
+                # فلترة المستخدمين حسب مجموعة الموظفين إذا كانت موجودة
+                if staff_group:
+                    domain.append(('groups_id', 'in', [staff_group.id]))
+
+                available_users = Users.search(domain)
+                
                 return request.render('odoo_student_management.add_staff_template', {
                     'available_users': available_users,
                 })
 
-            # ====== POST ======
+            # ===== معالجة طلب POST (حفظ البيانات) =====
             user = None
-            message_ctx = {}
-
-            # 1) ربط مستخدم موجود
+            
+            # --- الحالة 1: ربط مستخدم موجود ---
             user_id = kwargs.get('user_id')
             if user_id:
                 user = Users.browse(int(user_id))
                 if not user.exists():
-                    return request.render('odoo_student_management.add_staff_template', {
-                        'error': 'Selected user not found.',
-                    })
-                # تأكد أنه غير مرتبط بموظف نشط
-                if Staff.search_count([('user_id', '=', user.id), ('active', '=', True)]) > 0:
-                    return request.render('odoo_student_management.add_staff_template', {
-                        'error': 'This user is already linked to an active staff record.',
-                    })
-
-            # 2) أو إنشاء مستخدم جديد
+                    return request.render('odoo_student_management.add_staff_template', {'error': 'Selected user not found.'})
+            
+            # --- الحالة 2: إنشاء مستخدم جديد ---
             if not user:
                 name = kwargs.get('name')
                 email = kwargs.get('email')
                 password = kwargs.get('password')
+                phone = kwargs.get('phone') # إضافة حقل الهاتف
+
                 if not all([name, email, password]):
                     return request.render('odoo_student_management.add_staff_template', {
-                        'error': 'Select an existing user OR provide Name, Email, and Password to create one.',
+                        'error': 'To create a new user, you must provide Name, Email, and Password.',
                     })
+                
                 try:
-                    user = Users.create({
+                    user_vals = {
                         'name': name,
-                        'login': email,   # نستخدم الإيميل كدخول
+                        'login': email,
                         'email': email,
                         'password': password,
-                    })
+                        'phone': phone,
+                    }
+                    # إضافة المستخدم لمجموعة الموظفين عند الإنشاء
+                    if staff_group:
+                        user_vals['groups_id'] = [(6, 0, [staff_group.id])]
+                        
+                    user = Users.create(user_vals)
                 except Exception as e:
-                    _logger.error("Error creating user for staff: %s", e)
-                    return request.render('odoo_student_management.add_staff_template', {
-                        'error': 'Failed to create user account.',
-                    })
+                    _logger.error("Error creating user for staff: %s", e, exc_info=True)
+                    return request.render('odoo_student_management.add_staff_template', {'error': 'Failed to create user account. The email might already exist.'})
 
-            # ضم المستخدم لمجموعة الموظفين
-            if staff_group and user:
-                try:
-                    staff_group.sudo().write({'users': [(4, user.id)]})
-                except Exception as e:
-                    _logger.warning("Could not add user to staff group: %s", e)
-
-            # إنشاء سجل الموظف (لا تمرر name/email لأنها related لـ user_id)
-            staff_vals = {
-                'user_id': user.id,
-                'employee_id': kwargs.get('employee_id') or False,
-                'address': kwargs.get('address') or False,
-            }
+            # --- الخطوة النهائية: إنشاء سجل الموظف ---
             try:
+                staff_vals = {
+                    'user_id': user.id,
+                    'employee_id': kwargs.get('employee_id'),
+                    'address': kwargs.get('address'),
+                    'gender': kwargs.get('gender'), # إضافة حقل الجنس
+                }
                 Staff.create(staff_vals)
             except Exception as e:
-                _logger.error("Error creating staff record: %s", e)
-                return request.render('odoo_student_management.add_staff_template', {
-                    'error': 'Failed to create staff record.',
-                })
+                _logger.error("Error creating staff record: %s", e, exc_info=True)
+                return request.render('odoo_student_management.add_staff_template', {'error': 'Failed to create staff profile.'})
 
-            return request.render('odoo_student_management.add_staff_template', {
-                'success': 'Staff member added successfully.',
-            })
+            # بعد النجاح، إعادة التوجيه إلى صفحة إدارة الموظفين
+            return request.redirect('/student_management/admin/staff/manage')
 
         except AccessError:
             return request.redirect('/student_management/login')
+        except Exception as e:
+            # معالجة أي خطأ غير متوقع
+            _logger.error("Unhandled error in add_staff: %s", e, exc_info=True)
+            return request.render('odoo_student_management.add_staff_template', {
+                'error': 'An unexpected system error occurred. Please contact the administrator.'
+            })
+
 
     @http.route('/student_management/admin/staff/edit/<int:staff_id>', type='http', auth='user', methods=['GET', 'POST'])
     def edit_staff(self, staff_id, **kwargs):
@@ -251,6 +258,7 @@ class StudentManagementAdminController(http.Controller):
                 
         except AccessError:
             return request.redirect('/student_management/login')
+  
 
 
     @http.route('/student_management/admin/staff/manage', type='http', auth='user', website=True, methods=['GET'])
@@ -267,90 +275,123 @@ class StudentManagementAdminController(http.Controller):
 
 
 
-    # ==================== STUDENT MANAGEMENT ====================
+        # ==================== STUDENT MANAGEMENT ====================
 
-    @http.route('/student_management/admin/student/add', type='http', auth='user', methods=['GET', 'POST'])
+    @http.route('/student_management/admin/student/add', type='http', auth='user', website=True, methods=['GET', 'POST'])
     def add_student(self, **kwargs):
-        """Add new student"""
+        """Add new student (link existing user OR create new)"""
         try:
             self._check_admin_access()
-            
+            Student = request.env['student_management.student'].sudo()
+            Users = request.env['res.users'].sudo()
+
+            # مجموعة الطلاب
+            try:
+                student_group = request.env.ref(self.STUDENT_GROUP)
+            except Exception as e:
+                _logger.error("Could not find student group '%s': %s", self.STUDENT_GROUP, e)
+                student_group = None
+
             if request.httprequest.method == 'GET':
+                # جلب المستخدمين الذين لديهم صلاحية طالب وغير مرتبطين بملف طالب آخر
+                existing_student_user_ids = Student.search([('active', '=', True )]).mapped('user_id').ids
+                
+                domain = [
+                    ('active', '=', True),
+                    ('id', 'not in', existing_student_user_ids),
+                ]
+                if student_group:
+                    domain.append(('groups_id', 'in', [student_group.id]))
+
+                available_users = Users.search(domain)
+                
                 courses = request.env['student_management.course'].sudo().search([])
                 session_years = request.env['student_management.session_year'].sudo().search([])
+                
                 return request.render('odoo_student_management.add_student_template', {
-                    'courses': courses,
-                    'session_years': session_years
-                })
-            
-            # Handle POST request
-            first_name = kwargs.get('first_name')
-            last_name = kwargs.get('last_name')
-            username = kwargs.get('username')
-            email = kwargs.get('email')
-            password = kwargs.get('password')
-            address = kwargs.get('address')
-            course_id = kwargs.get('course_id')
-            session_year_id = kwargs.get('session_year_id')
-            gender = kwargs.get('gender')
-            profile_pic = request.httprequest.files.get('profile_pic')
-            
-            if not all([first_name, last_name, username, email, password, course_id, session_year_id]):
-                courses = request.env['student_management.course'].sudo().search([])
-                session_years = request.env['student_management.session_year'].sudo().search([])
-                return request.render('odoo_student_management.add_student_template', {
+                    'available_users': available_users,
                     'courses': courses,
                     'session_years': session_years,
-                    'error': 'All required fields must be filled'
                 })
+
+            # ====== POST ======
+            user = None
             
+            # 1) ربط مستخدم موجود
+            user_id = kwargs.get('user_id')
+            if user_id:
+                user = Users.browse(int(user_id))
+                if not user.exists():
+                    # (يمكن إضافة رسالة خطأ هنا)
+                    pass 
+            
+            # 2) أو إنشاء مستخدم جديد
+            if not user:
+                name = kwargs.get('name')
+                email = kwargs.get('email')
+                password = kwargs.get('password')
+                phone = kwargs.get('phone')
+                
+                if not all([name, email, password]):
+                     return request.render('odoo_student_management.add_student_template', {
+                        'error': 'Select an existing user OR provide Name, Email, and Password to create one.',
+                        # إعادة تمرير البيانات اللازمة للقالب
+                        'courses': request.env['student_management.course'].sudo().search([]),
+                        'session_years': request.env['student_management.session_year'].sudo().search([]),
+                    })
+                
+                try:
+                    user_vals = {
+                        'name': name,
+                        'login': email,
+                        'email': email,
+                        'password': password,
+                        'phone': phone,
+                    }
+                    # إضافة المستخدم لمجموعة الطلاب عند الإنشاء
+                    if student_group:
+                        user_vals['groups_id'] = [(6, 0, [student_group.id])]
+                    user = Users.create(user_vals)
+                except Exception as e:
+                    _logger.error("Error creating user for student: %s", e)
+                    # (يمكن إضافة رسالة خطأ هنا)
+
+            # 3) إنشاء سجل الطالب
             try:
-                # Create user
-                user_vals = {
-                    'name': f"{first_name} {last_name}",
-                    'login': email,
-                    'email': email,
-                    'password': password,
-                    'groups_id': [(6, 0, [request.env.ref('odoo_student_management.group_student_management_student').id])]
-                }
-                user = request.env['res.users'].sudo().create(user_vals)
-                
-                # Handle profile picture
                 profile_pic_data = None
-                if profile_pic:
-                    profile_pic_data = base64.b64encode(profile_pic.read())
-                
-                # Create student record
+                if 'profile_pic' in request.httprequest.files:
+                    profile_pic = request.httprequest.files.get('profile_pic' )
+                    if profile_pic.filename:
+                        profile_pic_data = base64.b64encode(profile_pic.read())
+
                 student_vals = {
                     'user_id': user.id,
-                    'name': f"{first_name} {last_name}",
-                    'email': email,
-                    'address': address,
-                    'course_id': int(course_id),
-                    'session_year_id': int(session_year_id),
-                    'gender': gender,
+                    'student_id': kwargs.get('student_id'),
+                    'address': kwargs.get('address'),
+                    'date_of_birth': kwargs.get('date_of_birth') or None,
+                    'gender': kwargs.get('gender'),
+                    'course_id': int(kwargs.get('course_id')),
+                    'session_year_id': int(kwargs.get('session_year_id')),
                     'profile_pic': profile_pic_data,
                 }
-                request.env['student_management.student'].sudo().create(student_vals)
-                
-                courses = request.env['student_management.course'].sudo().search([])
-                session_years = request.env['student_management.session_year'].sudo().search([])
-                return request.render('odoo_student_management.add_student_template', {
-                    'courses': courses,
-                    'session_years': session_years,
-                    'success': 'Student added successfully'
-                })
+                Student.create(student_vals)
             except Exception as e:
-                _logger.error(f"Error adding student: {str(e)}")
-                courses = request.env['student_management.course'].sudo().search([])
-                session_years = request.env['student_management.session_year'].sudo().search([])
-                return request.render('odoo_student_management.add_student_template', {
-                    'courses': courses,
-                    'session_years': session_years,
-                    'error': 'Failed to add student'
-                })
+                _logger.error("Error creating student record: %s", e)
+                # (يمكن إضافة رسالة خطأ هنا)
+
+            # إعادة التوجيه إلى صفحة إدارة الطلاب بعد النجاح
+            return request.redirect('/student_management/admin/student/manage')
+
         except AccessError:
             return request.redirect('/student_management/login')
+        except Exception as e:
+            _logger.error("Unhandled error in add_student: %s", e, exc_info=True)
+            return request.render('odoo_student_management.add_student_template', {
+                'error': 'An unexpected error occurred. Please check the logs.',
+                'courses': request.env['student_management.course'].sudo().search([]),
+                'session_years': request.env['student_management.session_year'].sudo().search([]),
+            })
+
 
 
     @http.route('/student_management/admin/student/manage', type='http', auth='user', methods=['GET'])
@@ -600,7 +641,7 @@ class StudentManagementAdminController(http.Controller):
                     'success': 'Subject updated successfully'
                 })
             except Exception as e:
-                __logger.error(f"Error updating subject: {str(e)}")
+                _logger.error(f"Error updating subject: {str(e)}")
                 courses = request.env['student_management.course'].sudo().search([])
                 staffs = request.env['student_management.staff'].sudo().search([])
                 return request.render('odoo_student_management.edit_subject_template', {

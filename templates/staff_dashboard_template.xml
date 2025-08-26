@@ -1,176 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- 
+        هذا هو القالب الصحيح للداشبورد.
+        1. يستدعي التخطيط العام ذو العمودين.
+        2. يمرر عنوان الصفحة (title).
+        3. يضع كل محتوى الداشبورد داخل كتلة t-call.
+           سيتم حقن هذا المحتوى في مكان <t t-raw="0"/> في التخطيط العام.
+    -->
     <template id="staff_dashboard_template" name="Staff Dashboard">
-        <t t-call="website.layout">
-            <div id="wrap">
-                <div class="container my-4">
-                    <!-- Header Section - Improved -->
-                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: #e0e0e0 !important;">
-                        <div>
-                            <h1 class="mb-1" style="color: #2c3e50; font-weight: 600;">
-                                <i class="fa fa-tachometer me-2"></i>Staff Dashboard
-                            </h1>
-                            <p class="text-muted mb-0">
-                                <i class="fa fa-user-circle-o me-1"></i>Welcome, <span style="color: #3498db; font-weight: 500;"><t t-out="staff.name"/></span>
-                            </p>
-                        </div>
-                        <a href="/student_management/staff/logout" class="btn btn-outline-danger btn-sm">
-                            <i class="fa fa-sign-out me-1"></i> Logout
-                        </a>
-                    </div>
+        <t t-call="odoo_student_management.portal_two_col_layout">
+            <t t-set="title">Staff Dashboard</t>
+            
+            <!-- START OF PAGE CONTENT -->
+            <!-- Header Section - Improved -->
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <div>
+                    <h1 class="mb-1" style="color: #2c3e50; font-weight: 600;">
+                        <i class="fa fa-tachometer me-2"/>Staff Dashboard
+                    </h1>
+                    <p class="text-muted mb-0">
+                        <i class="fa fa-user-circle-o me-1"/>Welcome, <span style="color: #3498db; font-weight: 500;"><t t-out="staff.name"/></span>
+                    </p>
+                </div>
+            </div>
 
-                    <!-- Stats Cards Section - Enhanced -->
-                    <div class="row mb-4 g-4">
-                        <div class="col-md-3">
-                            <div class="card text-center h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #f5f7fa 0%, #e4f1fe 100%);">
-                                <div class="card-body py-4">
-                                    <div class="icon-circle bg-primary-light mb-3 mx-auto">
-                                        <i class="fa fa-users fa-2x text-primary"></i>
-                                    </div>
-                                    <h5 class="card-title text-secondary mb-2">Total Students</h5>
-                                    <p class="card-text fs-3 fw-bold text-dark"><t t-out="student_count"/></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);">
-                                <div class="card-body py-4">
-                                    <div class="icon-circle bg-info-light mb-3 mx-auto">
-                                        <i class="fa fa-book fa-2x text-info"></i>
-                                    </div>
-                                    <h5 class="card-title text-secondary mb-2">Subjects Taught</h5>
-                                    <p class="card-text fs-3 fw-bold text-dark"><t t-out="subjects_count"/></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #f5f7fa 0%, #e8f8f5 100%);">
-                                <div class="card-body py-4">
-                                    <div class="icon-circle bg-success-light mb-3 mx-auto">
-                                        <i class="fa fa-check-square-o fa-2x text-success"></i>
-                                    </div>
-                                    <h5 class="card-title text-secondary mb-2">Total Attendance</h5>
-                                    <p class="card-text fs-3 fw-bold text-dark"><t t-out="attendance_count"/></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #f5f7fa 0%, #fff8e1 100%);">
-                                <div class="card-body py-4">
-                                    <div class="icon-circle bg-warning-light mb-3 mx-auto">
-                                        <i class="fa fa-calendar-times-o fa-2x text-warning"></i>
-                                    </div>
-                                    <h5 class="card-title text-secondary mb-2">Approved Leaves</h5>
-                                    <p class="card-text fs-3 fw-bold text-dark"><t t-out="leave_count"/></p>
-                                </div>
-                            </div>
+            <!-- Stats Cards Section -->
+            <div class="row mb-4 g-4">
+                <div class="col-md-3">
+                    <div class="card text-center h-100 shadow-sm">
+                        <div class="card-body py-4">
+                            <h5 class="card-title text-secondary mb-2">Total Students</h5>
+                            <p class="card-text fs-3 fw-bold text-dark"><t t-out="student_count"/></p>
                         </div>
                     </div>
-
-                    <!-- Main Content Section - Enhanced -->
-                    <div class="row g-4">
-                        <!-- Left Column: Subject Data -->
-                        <div class="col-lg-6">
-                            <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-white border-0 py-3">
-                                    <h5 class="mb-0 d-flex align-items-center">
-                                        <i class="fa fa-pie-chart me-2 text-primary"></i>
-                                        Attendance by Subject
-                                    </h5>
-                                </div>
-                                <div class="card-body pt-0">
-                                    <div class="list-group list-group-flush">
-                                        <t t-if="subject_data">
-                                            <t t-foreach="subject_data" t-as="subject">
-                                                <div class="list-group-item d-flex justify-content-between align-items-center py-3 px-4 border-0">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="subject-color me-3" style="width: 12px; height: 12px; background-color: #3498db; border-radius: 50%;"></div>
-                                                        <span class="fw-medium"><t t-out="subject['name']"/></span>
-                                                    </div>
-                                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
-                                                        <t t-out="subject['attendance_count']"/> records
-                                                    </span>
-                                                </div>
-                                            </t>
-                                        </t>
-                                        <t t-else="">
-                                            <div class="list-group-item text-muted py-3 px-4 border-0">
-                                                <i class="fa fa-info-circle me-2"></i>No subjects found.
-                                            </div>
-                                        </t>
-                                    </div>
-                                </div>
-                            </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center h-100 shadow-sm">
+                        <div class="card-body py-4">
+                            <h5 class="card-title text-secondary mb-2">Subjects Taught</h5>
+                            <p class="card-text fs-3 fw-bold text-dark"><t t-out="subjects_count"/></p>
                         </div>
-
-                        <!-- Right Column: Student Data -->
-                        <div class="col-lg-6">
-                            <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-white border-0 py-3">
-                                    <h5 class="mb-0 d-flex align-items-center">
-                                        <i class="fa fa-bar-chart me-2 text-success"></i>
-                                        Student Attendance Summary
-                                    </h5>
-                                </div>
-                                <div class="card-body pt-0 px-0" style="max-height: 400px; overflow-y: auto;">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover align-middle mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="ps-4">Student Name</th>
-                                                    <th class="text-center">Present</th>
-                                                    <th class="text-center">Absent</th>
-                                                    <th class="text-center pe-4">Rate</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <t t-if="student_data">
-                                                    <t t-foreach="student_data" t-as="student">
-                                                        <tr>
-                                                            <td class="ps-4 fw-medium"><t t-out="student['name']"/></td>
-                                                            <td class="text-center">
-                                                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
-                                                                    <t t-out="student['present_count']"/>
-                                                                </span>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2">
-                                                                    <t t-out="student['absent_count']"/>
-                                                                </span>
-                                                            </td>
-                                                            <td class="text-center pe-4">
-                                                                <t t-set="total" t-value="student['present_count'] + student['absent_count']"/>
-                                                                <t t-if="total > 0">
-                                                                    <t t-set="rate" t-value="round((student['present_count'] / total) * 100)"/>
-                                                                    <div class="progress" style="height: 6px;">
-                                                                        <div class="progress-bar bg-success" role="progressbar" t-att-style="'width: ' + str(rate) + '%'" aria-valuenow="rate" aria-valuemin="0" aria-valuemax="100"></div>
-                                                                    </div>
-                                                                    <small class="text-muted"><t t-out="rate"/>%</small>
-                                                                </t>
-                                                                <t t-else="">
-                                                                    <small class="text-muted">N/A</small>
-                                                                </t>
-                                                            </td>
-                                                        </tr>
-                                                    </t>
-                                                </t>
-                                                <t t-else="">
-                                                    <tr>
-                                                        <td colspan="4" class="text-center text-muted py-4">
-                                                            <i class="fa fa-info-circle me-2"></i>No student data available.
-                                                        </td>
-                                                    </tr>
-                                                </t>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center h-100 shadow-sm">
+                        <div class="card-body py-4">
+                            <h5 class="card-title text-secondary mb-2">Total Attendance</h5>
+                            <p class="card-text fs-3 fw-bold text-dark"><t t-out="attendance_count"/></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center h-100 shadow-sm">
+                        <div class="card-body py-4">
+                            <h5 class="card-title text-secondary mb-2">Approved Leaves</h5>
+                            <p class="card-text fs-3 fw-bold text-dark"><t t-out="leave_count"/></p>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Main Content Section -->
+            <div class="row g-4">
+                <!-- Left Column: Subject Data -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">Attendance by Subject</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <t t-foreach="subject_data" t-as="subject">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <t t-out="subject['name']"/>
+                                        <span class="badge bg-primary rounded-pill"><t t-out="subject['attendance_count']"/> records</span>
+                                    </li>
+                                </t>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Student Data -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">Student Attendance Summary</h5>
+                        </div>
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr><th>Student</th><th>Present</th><th>Absent</th></tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="student_data" t-as="student">
+                                        <tr>
+                                            <td><t t-out="student['name']"/></td>
+                                            <td><span class="badge bg-success"><t t-out="student['present_count']"/></span></td>
+                                            <td><span class="badge bg-danger"><t t-out="student['absent_count']"/></span></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END OF PAGE CONTENT -->
             <!-- Custom CSS Styles -->
             <style>
                 .icon-circle {

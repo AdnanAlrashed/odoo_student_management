@@ -38,8 +38,12 @@ class Student(models.Model):
     # Student-specific Information
     student_id = fields.Char(
         string='Student ID',
-        help='Unique student identification number'
+        help='Unique student identification number',
+        readonly=True, # اجعله للقراءة فقط لمنع التعديل اليدوي
+        copy=False, # لا تقم بنسخ الرقم عند استنساخ سجل
+        default=lambda self: _('New') # قيمة افتراضية قبل الحفظ
     )
+
     address = fields.Text(
         string='Address',
         help='Home address of the student'
@@ -249,19 +253,44 @@ class Student(models.Model):
     #                     student_group.users = [(4, student.user_id.id)]
     #     return result
 
+    # داخل كلاس Student(models.Model) في ملف models/student.py
+
     @api.model_create_multi
     def create(self, vals_list):
-        students = super().create(vals_list)
+        """
+        Override create to:
+        1. Assign a unique Student ID from a sequence.
+        2. Automatically link subjects based on the student's course.
+        """
+        # --- الخطوة 1: تعيين الرقم التسلسلي لكل طالب جديد ---
+        for vals in vals_list:
+            # إذا لم يتم توفير رقم هوية، أو كانت قيمته الافتراضية "New"
+            if not vals.get('student_id') or vals['student_id'] == _('New'):
+                # استدعاء التسلسل الذي قمنا بتعريفه في ملف XML
+                sequence_code = 'student.id.sequence'
+                vals['student_id'] = self.env['ir.sequence'].next_by_code(sequence_code) or _('New')
+
+        # --- الخطوة 2: إنشاء سجلات الطلاب باستخدام البيانات المحدثة ---
+        # استدعاء دالة create الأصلية لإنشاء السجلات في قاعدة البيانات
+        students = super(Student, self).create(vals_list)
+
+        # --- الخطوة 3: تنفيذ عمليات ما بعد الإنشاء (مثل ربط المواد) ---
+        # الآن students هو recordset يحتوي على السجلات التي تم إنشاؤها للتو
         for student in students:
+            # إذا كان الطالب مسجلاً في دورة
             if student.course_id:
-                # البحث عن جميع المواد المرتبطة بالدورة
+                # البحث عن جميع المواد المرتبطة بهذه الدورة
                 subjects = self.env['student_management.subject'].search([
                     ('course_id', '=', student.course_id.id)
                 ])
-                # ربط الطالب بجميع هذه المواد
+                # إذا تم العثور على مواد، قم بربطها بالطالب
                 if subjects:
+                    # استخدام (6, 0, ...) يقوم باستبدال أي روابط حالية بالقائمة الجديدة
                     student.write({'subject_ids': [(6, 0, subjects.ids)]})
+                    
         return students
+
+
 
     def write(self, vals):
         # إذا تم تغيير الدورة، قم بتحديث المواد المرتبطة بالطالب

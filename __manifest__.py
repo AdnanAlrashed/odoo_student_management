@@ -43,6 +43,7 @@
         'security/ir.model.access.csv',
         
         # Data
+        'data/sequence_data.xml',
         'data/session_year_data.xml',
         'data/course_data.xml',
         

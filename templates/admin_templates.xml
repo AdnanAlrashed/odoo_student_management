@@ -361,45 +361,107 @@
         </t>
     </template>
 
-    <!-- Manage Staff -->
-    <template id="edit_staff_template" name="Edit Staff">
+    <!-- Add Staff Template - Enhanced Version -->
+    <template id="add_staff_template" name="Add Staff">
         <t t-call="odoo_student_management.portal_two_col_layout">
-            <t t-set="title">Edit Staff</t>
+            <t t-set="title">Add New Staff Member</t>
 
-            <h2>Edit Staff Member</h2>
-
+            <!-- عرض رسائل الخطأ (رسالة النجاح لم تعد ضرورية بسبب إعادة التوجيه) -->
             <t t-if="error">
-            <div class="alert alert-danger" role="alert" t-out="error"/>
-            </t>
-            <t t-if="success">
-            <div class="alert alert-success" role="alert" t-out="success"/>
+                <div class="alert alert-danger" role="alert">
+                    <i class="fa fa-exclamation-triangle me-2"/>
+                    <t t-out="error"/>
+                </div>
             </t>
 
-            <form t-attf-action="/student_management/admin/staff/edit/{{ staff.id }}" method="post" class="o_website_form">
-            <!-- ✅ CSRF token -->
-            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <form action="/student_management/admin/staff/add" method="post" class="o_website_form">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
 
-            <!-- Update Staff Email -->
-            <div class="card mb-3">
-                <div class="card-body">
-                <h5 class="mb-3">Staff Information</h5>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" t-att-value="staff.user_id.email"/>
-                    </div>
-                    <div class="col-md-6">
-                    <label class="form-label">Address</label>
-                    <input type="text" name="address" class="form-control" t-att-value="staff.address" />
+                <!-- ================== 1. ربط مستخدم موجود ================== -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Link Existing User</h5>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-8">
+                                <label class="form-label" for="user_id">Select User</label>
+                                <select name="user_id" id="user_id" class="form-select">
+                                    <option value="">-- Choose an existing user --</option>
+                                    <!-- القائمة المنسدلة الآن تعرض فقط المستخدمين الذين لديهم صلاحية موظف -->
+                                    <t t-foreach="available_users or []" t-as="u">
+                                        <option t-att-value="u.id">
+                                            <t t-out="u.name"/> (<t t-out="u.login"/>)
+                                        </option>
+                                    </t>
+                                </select>
+                                <!-- تم تحديث رسالة المساعدة لتعكس المنطق الجديد -->
+                                <small class="text-muted">Only users with 'Staff' access rights who are not already linked to a staff profile are shown.</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                </div>
-            </div>
 
-            <button type="button" class="btn-primary" id="saveStaffBtn">Update Staff</button>
+                <div class="text-center my-2">— OR —</div>
+
+                <!-- ================== 2. إنشاء مستخدم جديد ================== -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Create New User</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="name">Full Name</label>
+                                <input type="text" name="name" id="name" class="form-control"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="email">Email (for login)</label>
+                                <input type="email" name="email" id="email" class="form-control"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="password">Password</label>
+                                <input type="password" name="password" id="password" class="form-control"/>
+                            </div>
+                            <!-- تمت إضافة حقل الهاتف -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="phone">Phone</label>
+                                <input type="text" name="phone" id="phone" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================== 3. بيانات الموظف الإضافية ================== -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Additional Staff Info</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="employee_id">Employee ID</label>
+                                <input type="text" name="employee_id" id="employee_id" class="form-control"/>
+                            </div>
+                            <!-- تمت إضافة حقل الجنس -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="gender">Gender</label>
+                                <select name="gender" id="gender" class="form-select">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label" for="address">Address</label>
+                                <input type="text" name="address" id="address" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-check me-2"/>
+                    Save Staff Member
+                </button>
             </form>
         </t>
     </template>
+
 
     <!-- Manage Staff (list) -->
     <template id="manage_staff_template" name="Manage Staff">
@@ -446,87 +508,210 @@
             </table>
 
             <script>
-  function openEditModal(staffId) {
-    fetch('/student_management/admin/staff/edit/' + staffId)
-      .then(r =&gt; r.text())
-      .then(html =&gt; {
-        const modal = document.getElementById('editModal');
-        const container = document.getElementById('modalContent');
+                function openEditModal(staffId) {
+                    fetch('/student_management/admin/staff/edit/' + staffId)
+                    .then(r =&gt; r.text())
+                    .then(html =&gt; {
+                        const modal = document.getElementById('editModal');
+                        const container = document.getElementById('modalContent');
 
-        container.innerHTML = html;      // حقن النموذج
-        modal.style.display = 'flex';    // إظهار المنبثقة
+                        container.innerHTML = html;      // حقن النموذج
+                        modal.style.display = 'flex';    // إظهار المنبثقة
 
-        wireStaffEdit(staffId);          // ⬅️ اربط الأحداث بعد الحقن
-      })
-      .catch(err =&gt; {
-        console.error('Error:', err);
-        window.open('/student_management/admin/staff/edit/' + staffId, '_blank');
-      });
-  }
+                        wireStaffEdit(staffId);          // ⬅️ اربط الأحداث بعد الحقن
+                    })
+                    .catch(err =&gt; {
+                        console.error('Error:', err);
+                        window.open('/student_management/admin/staff/edit/' + staffId, '_blank');
+                    });
+                }
 
-  function wireStaffEdit(staffId) {
-    const container = document.getElementById('modalContent');
-    const form = container.querySelector('#staffEditForm') || container.querySelector('form');
-    const btn = container.querySelector('#submitBtn, #saveStaffBtn, button[type="submit"]');
-    const loading = container.querySelector('#loading');
+                function wireStaffEdit(staffId) {
+                    const container = document.getElementById('modalContent');
+                    const form = container.querySelector('#staffEditForm') || container.querySelector('form');
+                    const btn = container.querySelector('#submitBtn, #saveStaffBtn, button[type="submit"]');
+                    const loading = container.querySelector('#loading');
 
-    if (!form) return;
+                    if (!form) return;
 
-    // حدّد رابط الإرسال (من action إن وجد وإلا استخدم الـ id)
-    const editUrl = (form.getAttribute('action') &amp;&amp; form.getAttribute('action').trim())
-                    ? form.getAttribute('action')
-                    : '/student_management/admin/staff/edit/' + staffId;
+                    // حدّد رابط الإرسال (من action إن وجد وإلا استخدم الـ id)
+                    const editUrl = (form.getAttribute('action') &amp;&amp; form.getAttribute('action').trim())
+                                    ? form.getAttribute('action')
+                                    : '/student_management/admin/staff/edit/' + staffId;
 
-    // تجنّب الإرسال العادي
-    form.addEventListener('submit', function(e){ e.preventDefault(); doSubmit(); });
-    if (btn) {
-      if (btn.type === 'submit') btn.type = 'button'; // منع الإرسال العادي
-      btn.addEventListener('click', function(e){ e.preventDefault(); doSubmit(); });
-    }
-    form.addEventListener('keydown', function(e){
-      if (e.key === 'Enter') { e.preventDefault(); doSubmit(); }
-    });
+                    // تجنّب الإرسال العادي
+                    form.addEventListener('submit', function(e){ e.preventDefault(); doSubmit(); });
+                    if (btn) {
+                    if (btn.type === 'submit') btn.type = 'button'; // منع الإرسال العادي
+                    btn.addEventListener('click', function(e){ e.preventDefault(); doSubmit(); });
+                    }
+                    form.addEventListener('keydown', function(e){
+                    if (e.key === 'Enter') { e.preventDefault(); doSubmit(); }
+                    });
 
-    function doSubmit() {
-      if (btn) btn.disabled = true;
-      if (loading) loading.style.display = 'block';
+                    function doSubmit() {
+                    if (btn) btn.disabled = true;
+                    if (loading) loading.style.display = 'block';
 
-      const fd = new FormData(form);
-      fetch(editUrl, {
-        method: 'POST',
-        body: fd,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      })
-      .then(r =&gt; r.text())
-      .then(text =&gt; {
-        if (loading) loading.style.display = 'none';
-        if (text.trim() === 'OK') {
-          closeEditModal();                       // اغلق المنبثقة
-          alert('تم تعديل بيانات الموظف بنجاح'); // رسالة نجاح
-          // لو تحب تحدّث القائمة:
-          // location.reload();
-        } else {
-          alert('خطأ: ' + text);
-          if (btn) btn.disabled = false;
-        }
-      })
-      .catch(err =&gt; {
-        if (loading) loading.style.display = 'none';
-        if (btn) btn.disabled = false;
-        alert('Network error. Please try again.');
-        console.error(err);
-      });
-    }
-  }
+                    const fd = new FormData(form);
+                    fetch(editUrl, {
+                        method: 'POST',
+                        body: fd,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(r =&gt; r.text())
+                    .then(text =&gt; {
+                        if (loading) loading.style.display = 'none';
+                        if (text.trim() === 'OK') {
+                        closeEditModal();                       // اغلق المنبثقة
+                        alert('تم تعديل بيانات الموظف بنجاح'); // رسالة نجاح
+                        // لو تحب تحدّث القائمة:
+                        // location.reload();
+                        } else {
+                        alert('خطأ: ' + text);
+                        if (btn) btn.disabled = false;
+                        }
+                    })
+                    .catch(err =&gt; {
+                        if (loading) loading.style.display = 'none';
+                        if (btn) btn.disabled = false;
+                        alert('Network error. Please try again.');
+                        console.error(err);
+                    });
+                    }
+                }
 
-  function closeEditModal() {
-    document.getElementById('editModal').style.display = 'none';
-    document.getElementById('modalContent').innerHTML = '';
-  }
-</script>
+                function closeEditModal() {
+                    document.getElementById('editModal').style.display = 'none';
+                    document.getElementById('modalContent').innerHTML = '';
+                }
+            </script>
 
         </t>
     </template>
+    
+    <!-- Add Student -->
+    <template id="add_student_template" name="Add Student">
+        <t t-call="odoo_student_management.portal_two_col_layout">
+            <t t-set="title">Add New Student</t>
+
+            <!-- عرض رسائل الخطأ أو النجاح -->
+            <t t-if="error">
+                <div class="alert alert-danger" role="alert" t-out="error"/>
+            </t>
+            <t t-if="success">
+                <div class="alert alert-success" role="alert" t-out="success"/>
+            </t>
+
+            <form action="/student_management/admin/student/add" method="post" class="o_website_form" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                <!-- ================== 1. ربط مستخدم موجود ================== -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Link Existing User</h5>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-8">
+                                <label class="form-label" for="user_id">Select User</label>
+                                <select name="user_id" id="user_id" class="form-select">
+                                    <option value="">-- Choose an existing user --</option>
+                                    <!-- يتم عرض المستخدمين الذين لديهم صلاحية طالب وغير مرتبطين بطالب آخر -->
+                                    <t t-foreach="available_users or []" t-as="u">
+                                        <option t-att-value="u.id">
+                                            <t t-out="u.name"/> (<t t-out="u.login"/>)
+                                        </option>
+                                    </t>
+                                </select>
+                                <small class="text-muted">Only users with 'Student' access rights who are not already linked to a student profile are shown.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center my-2">— OR —</div>
+
+                <!-- ================== 2. إنشاء مستخدم جديد ================== -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Create New User</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="name">Full Name</label>
+                                <input type="text" name="name" id="name" class="form-control"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="email">Email (for login)</label>
+                                <input type="email" name="email" id="email" class="form-control"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="password">Password</label>
+                                <input type="password" name="password" id="password" class="form-control"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="phone">Phone</label>
+                                <input type="text" name="phone" id="phone" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================== 3. بيانات الطالب الأكاديمية والشخصية ================== -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="mb-3">Student Information</h5>
+                        <div class="row g-3">
+                            <!-- الحقول الأكاديمية -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="course_id">Course</label>
+                                <select name="course_id" id="course_id" class="form-select" required="required">
+                                    <t t-foreach="courses or []" t-as="c">
+                                        <option t-att-value="c.id" t-out="c.course_name"/>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="session_year_id">Session Year</label>
+                                <select name="session_year_id" id="session_year_id" class="form-select" required="required">
+                                    <t t-foreach="session_years or []" t-as="s">
+                                        <option t-att-value="s.id" t-out="s.display_name"/>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="student_id">Student ID</label>
+                                <input type="text" name="student_id" id="student_id" class="form-control"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="date_of_birth">Date of Birth</label>
+                                <input type="date" name="date_of_birth" id="date_of_birth" class="form-control"/>
+                            </div>
+                            
+                            <!-- الحقول الشخصية -->
+                            <div class="col-md-12">
+                                <label class="form-label" for="address">Address</label>
+                                <input type="text" name="address" id="address" class="form-control"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="gender">Gender</label>
+                                <select name="gender" id="gender" class="form-select">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="profile_pic">Profile Picture</label>
+                                <input type="file" name="profile_pic" id="profile_pic" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Student</button>
+            </form>
+        </t>
+    </template>
+
 
 
 

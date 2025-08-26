@@ -77,7 +77,8 @@ class StudentManagementStaffController(http.Controller):
                     'absent_count': absent_count
                 })
             
-            return request.render('odoo_student_management.portal_two_col_layout', {
+            # استخدام القالب الصحيح للداشبورد
+            return request.render('odoo_student_management.staff_dashboard_template', {
                 'student_count': student_count,
                 'attendance_count': attendance_count,
                 'leave_count': leave_count,
