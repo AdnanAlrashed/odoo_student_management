@@ -37,11 +37,11 @@ class Student(models.Model):
     
     # Student-specific Information
     student_id = fields.Char(
-        string='Student ID',
-        help='Unique student identification number',
-        readonly=True, # اجعله للقراءة فقط لمنع التعديل اليدوي
-        copy=False, # لا تقم بنسخ الرقم عند استنساخ سجل
-        default=lambda self: _('New') # قيمة افتراضية قبل الحفظ
+        string='Student ID', 
+        required=True, 
+        readonly=True, 
+        default='New',
+        copy=False
     )
 
     address = fields.Text(
@@ -145,21 +145,16 @@ class Student(models.Model):
         'student_id',
         string='Academic Results'
     )
-    # subject_ids = fields.One2many(
-    #     'student_management.subject',
-    #     'course_id',
-    #     string='Subjects',
-    #     compute='_compute_subject_ids',
-    # )
 
     subject_ids = fields.Many2many(
-    'student_management.subject',
-    'subject_student_rel',  # نفس اسم الجدول الوسيط المستخدم في نموذج المادة
-    'student_id',
-    'subject_id',
-    string='Subjects',
-    readonly=True, # اجعله للقراءة فقط لأنه يتم تحديثه تلقائياً
+        'student_management.subject',
+        'subject_student_rel',
+        'student_id',
+        'subject_id',
+        string='Subjects',
+        readonly=True,
     )
+    
     # Computed fields
     subject_count = fields.Integer(
         string='Subject Count',
@@ -198,11 +193,11 @@ class Student(models.Model):
     @api.constrains('student_id')
     def _check_student_id_unique(self):
         for record in self:
-            if record.student_id:
+            if record.student_id and record.student_id != 'New':
                 existing = self.search([
                     ('id', '!=', record.id),
                     ('student_id', '=', record.student_id)
-                ])
+                ], limit=1)
                 if existing:
                     raise ValidationError(
                         f"Student ID '{record.student_id}' already exists."
@@ -215,7 +210,7 @@ class Student(models.Model):
                 existing = self.search([
                     ('id', '!=', record.id),
                     ('user_id', '=', record.user_id.id)
-                ])
+                ], limit=1)
                 if existing:
                     raise ValidationError(
                         f"User account is already linked to another student."
@@ -229,70 +224,63 @@ class Student(models.Model):
                     "Current semester must be greater than 0."
                     )
 
-    # @api.model_create_multi
-    # def create(self, vals_list):
-    #     """Override create to ensure users are assigned to student group"""
-    #     students = super().create(vals_list)
-    #     student_group = self.env.ref('odoo_student_management.group_student_management_student', raise_if_not_found=False)
-    #     if student_group:
-    #         user_ids = [s.user_id.id for s in students if s.user_id]
-    #         if user_ids:
-    #             student_group.users = [(4, uid) for uid in user_ids]
-    #     return students
-
-
-    # def write(self, vals):
-    #     """Override write to handle user group changes"""
-    #     result = super().write(vals)
-    #     if 'user_id' in vals:
-    #         for student in self:
-    #             if student.user_id:
-    #                 # Add user to student group
-    #                 student_group = self.env.ref('odoo_student_management.group_student_management_student', raise_if_not_found=False)
-    #                 if student_group:
-    #                     student_group.users = [(4, student.user_id.id)]
-    #     return result
-
-    # داخل كلاس Student(models.Model) في ملف models/student.py
-
     @api.model_create_multi
     def create(self, vals_list):
         """
-        Override create to:
-        1. Assign a unique Student ID from a sequence.
-        2. Automatically link subjects based on the student's course.
+        Override create to assign unique Student ID from sequence
         """
-        # --- الخطوة 1: تعيين الرقم التسلسلي لكل طالب جديد ---
+        # أولاً: التحقق من جميع القيود قبل الحصول على التسلسل
         for vals in vals_list:
-            # إذا لم يتم توفير رقم هوية، أو كانت قيمته الافتراضية "New"
-            if not vals.get('student_id') or vals['student_id'] == _('New'):
-                # استدعاء التسلسل الذي قمنا بتعريفه في ملف XML
-                sequence_code = 'student.id.sequence'
-                vals['student_id'] = self.env['ir.sequence'].next_by_code(sequence_code) or _('New')
-
-        # --- الخطوة 2: إنشاء سجلات الطلاب باستخدام البيانات المحدثة ---
-        # استدعاء دالة create الأصلية لإنشاء السجلات في قاعدة البيانات
+            # التحقق من تفرد user_id
+            if vals.get('user_id'):
+                existing = self.search([('user_id', '=', vals['user_id'])], limit=1)
+                if existing:
+                    raise ValidationError("User account is already linked to another student.")
+            
+            # التحقق من القيود الأخرى
+            if vals.get('current_semester') and vals['current_semester'] <= 0:
+                raise ValidationError("Current semester must be greater than 0.")
+        
+        # ثانياً: الحصول على الأرقام التسلسلية بعد التحقق من جميع القيود
+        sequence = self.env['ir.sequence']
+        student_ids_to_assign = []
+        
+        for vals in vals_list:
+            if not vals.get('student_id') or vals.get('student_id') == 'New':
+                try:
+                    student_id = sequence.next_by_code('student.id.sequence')
+                    if student_id:
+                        student_ids_to_assign.append(student_id)
+                    else:
+                        student_ids_to_assign.append(None)
+                except Exception:
+                    student_ids_to_assign.append(None)
+            else:
+                student_ids_to_assign.append(vals.get('student_id'))
+        
+        # ثالثاً: تعيين الأرقام التسلسلية
+        for i, vals in enumerate(vals_list):
+            if student_ids_to_assign[i]:
+                vals['student_id'] = student_ids_to_assign[i]
+        
+        # رابعاً: إنشاء السجلات
         students = super(Student, self).create(vals_list)
-
-        # --- الخطوة 3: تنفيذ عمليات ما بعد الإنشاء (مثل ربط المواد) ---
-        # الآن students هو recordset يحتوي على السجلات التي تم إنشاؤها للتو
+        
+        # خامساً: ربط المواد بالطالب بناءً على الدورة
         for student in students:
-            # إذا كان الطالب مسجلاً في دورة
             if student.course_id:
-                # البحث عن جميع المواد المرتبطة بهذه الدورة
                 subjects = self.env['student_management.subject'].search([
                     ('course_id', '=', student.course_id.id)
                 ])
-                # إذا تم العثور على مواد، قم بربطها بالطالب
                 if subjects:
-                    # استخدام (6, 0, ...) يقوم باستبدال أي روابط حالية بالقائمة الجديدة
-                    student.write({'subject_ids': [(6, 0, subjects.ids)]})
-                    
+                    student.subject_ids = [(6, 0, subjects.ids)]
+        
         return students
 
-
-
     def write(self, vals):
+        """
+        Override write to update subjects when course changes
+        """
         # إذا تم تغيير الدورة، قم بتحديث المواد المرتبطة بالطالب
         if 'course_id' in vals:
             subjects = self.env['student_management.subject'].search([
@@ -300,21 +288,11 @@ class Student(models.Model):
             ])
             if subjects:
                 vals['subject_ids'] = [(6, 0, subjects.ids)]
-                
-        result = super().write(vals)
-        return result
-
-    # يجب أيضاً تعديل الحقل المحسوب للمواد ليعتمد على الدورة
-    @api.depends('course_id')
-    def _compute_subject_ids(self):
-        for record in self:
-            if record.course_id:
-                record.subject_ids = self.env['student_management.subject'].search([
-                    ('course_id', '=', record.course_id.id)
-                ])
             else:
-                record.subject_ids = False
-
+                vals['subject_ids'] = [(5, 0, 0)]  # إزالة جميع المواد إذا لم توجد
+        
+        result = super(Student, self).write(vals)
+        return result
 
     def action_view_attendance(self):
         """Action to view attendance records of this student"""
@@ -386,7 +364,7 @@ class Student(models.Model):
         result = []
         for record in self:
             name = record.name or 'New Student'
-            if record.student_id:
+            if record.student_id and record.student_id != 'New':
                 name = f"[{record.student_id}] {name}"
             if record.course_id:
                 name = f"{name} ({record.course_id.course_name})"
@@ -408,12 +386,6 @@ class Student(models.Model):
             students = self.search(domain + args, limit=limit)
             return students.name_get()
         return super().name_search(name, args, operator, limit)
-
-    # def _compute_subject_ids(self):
-    #     for record in self:
-    #         record.subject_ids = self.env['student_management.subject'].search([
-    #             ('course_id', '=', record.course_id.id)
-    #         ])
 
     def _compute_subject_count(self):
         for record in self:
@@ -446,7 +418,6 @@ class Student(models.Model):
         self.write({'active': False})
         return True
 
-# student Profile
     def action_open_student_profile_wizard(self):
         """
         Creates and opens the student profile editing wizard.
@@ -468,14 +439,3 @@ class Student(models.Model):
             'res_id': wizard.id,
             'target': 'new',
         }
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        students = super().create(vals_list)
-        for student in students:
-            if student.course_id:
-                subjects = self.env['student_management.subject'].search([
-                    ('course_id', '=', student.course_id.id)
-                ])
-                student.write({'subject_ids': [(6, 0, subjects.ids)]})
-        return students

@@ -23,7 +23,7 @@ class StudentManagementStudentController(http.Controller):
             raise UserError("Student record not found for current user")
         return student
 
-    @http.route('/student_management/student/dashboard', type='http', auth='user', methods=['GET'])
+    @http.route('/student_management/student/dashboard', type='http', auth='user', website=True, methods=['GET'])
     def student_dashboard(self, **kwargs):
         """Student dashboard page"""
         try:
@@ -41,28 +41,58 @@ class StudentManagementStudentController(http.Controller):
                 ('status', '=', 'absent')
             ])
             
-            # Get subjects count for student's course
-            subjects_count = request.env['student_management.subject'].search_count([('course_id', '=', student.course_id.id)])
+            # Get subjects count and course info with safe access
+            subjects_count = 0
+            course_name = "Not Available"
+            session_name = "Not Available"
+            
+            try:
+                # محاولة الوصول إلى بيانات المقرر بشكل آمن
+                if student.course_id:
+                    subjects_count = request.env['student_management.subject'].search_count([
+                        ('course_id', '=', student.course_id.id)
+                    ])
+                    course_name = student.course_id.course_name
+            except Exception as e:
+                _logger.warning(f"Could not access course data for student {student.id}: {str(e)}")
+                # إذا فشل الوصول، نحاول طريقة بديلة
+                subjects_count = request.env['student_management.subject'].search_count([])
+            
+            try:
+                if student.session_year_id:
+                    session_name = student.session_year_id.session_name
+            except Exception as e:
+                _logger.warning(f"Could not access session data for student {student.id}: {str(e)}")
             
             # Get attendance data by subject
-            subjects = request.env['student_management.subject'].search([('course_id', '=', student.course_id.id)])
             subject_data = []
-            for subject in subjects:
-                present_count = request.env['student_management.attendance'].search_count([
-                    ('student_id', '=', student.id),
-                    ('subject_id', '=', subject.id),
-                    ('status', '=', 'present')
-                ])
-                absent_count = request.env['student_management.attendance'].search_count([
-                    ('student_id', '=', student.id),
-                    ('subject_id', '=', subject.id),
-                    ('status', '=', 'absent')
-                ])
-                subject_data.append({
-                    'name': subject.subject_name,
-                    'present_count': present_count,
-                    'absent_count': absent_count
-                })
+            try:
+                subjects = request.env['student_management.subject'].search([])
+                for subject in subjects:
+                    try:
+                        present_count = request.env['student_management.attendance'].search_count([
+                            ('student_id', '=', student.id),
+                            ('subject_id', '=', subject.id),
+                            ('status', '=', 'present')
+                        ])
+                        absent_count = request.env['student_management.attendance'].search_count([
+                            ('student_id', '=', student.id),
+                            ('subject_id', '=', subject.id),
+                            ('status', '=', 'absent')
+                        ])
+                        
+                        # Only add subjects with attendance records
+                        if present_count > 0 or absent_count > 0:
+                            subject_data.append({
+                                'name': subject.subject_name,
+                                'present_count': present_count,
+                                'absent_count': absent_count
+                            })
+                    except Exception as e:
+                        _logger.warning(f"Could not get attendance for subject {subject.id}: {str(e)}")
+                        continue
+            except Exception as e:
+                _logger.error(f"Error getting subject data: {str(e)}")
             
             return request.render('odoo_student_management.student_dashboard_template', {
                 'total_attendance': total_attendance,
@@ -70,10 +100,18 @@ class StudentManagementStudentController(http.Controller):
                 'absent_attendance': absent_attendance,
                 'subjects_count': subjects_count,
                 'subject_data': subject_data,
-                'student': student
+                'student': student,
+                'course_name': course_name,
+                'session_name': session_name
             })
         except AccessError:
             return request.redirect('/student_management/login')
+        except Exception as e:
+            _logger.error(f"Error in student dashboard: {str(e)}")
+            return request.render('odoo_student_management.error_template', {
+                'error_message': 'An error occurred while loading your dashboard.'
+            })
+
 
     # ==================== ATTENDANCE VIEWING ====================
 

@@ -1,10 +1,283 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="student_dashboard_template" name="Student Dashboard">
-        <t t-call="odoo_student_management.layout">
+        <t t-call="odoo_student_management.portal_two_col_layout">
             <t t-set="title">Student Dashboard</t>
-            <h1>Welcome, <t t-esc="student.name"/>!</h1>
-            <p>This is your dashboard. You can view your attendance, results, and apply for leave.</p>
+
+            <!-- Welcome -->
+            <div class="mb-4">
+                <h1 class="h2 text-primary mb-2">Welcome, <t t-out="student.name"/>!</h1>
+                <p class="text-muted">Student ID: <t t-out="student.student_id or 'N/A'"/></p>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="row mb-4">
+                <!-- Total Classes -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas fa-calendar-check text-primary fa-2x"></i>
+                                </div>
+                            </div>
+                            <h3 class="h4 mb-1 text-primary" t-out="total_attendance or '0'">0</h3>
+                            <p class="text-muted mb-0 small">Total Classes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Present Classes -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas fa-check-circle text-success fa-2x"></i>
+                                </div>
+                            </div>
+                            <h3 class="h4 mb-1 text-success" t-out="present_attendance or '0'">0</h3>
+                            <p class="text-muted mb-0 small">Present</p>
+                            <small class="text-muted">
+                                <t t-if="total_attendance > 0">
+                                    <t t-esc="round((present_attendance/total_attendance)*100, 2)"/>%
+                                </t>
+                                <t t-else="">0%</t>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Absent Classes -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas fa-times-circle text-danger fa-2x"></i>
+                                </div>
+                            </div>
+                            <h3 class="h4 mb-1 text-danger" t-out="absent_attendance or '0'">0</h3>
+                            <p class="text-muted mb-0 small">Absent</p>
+                            <small class="text-muted">
+                                <t t-if="total_attendance > 0">
+                                    <t t-esc="round((absent_attendance/total_attendance)*100, 2)"/>%
+                                </t>
+                                <t t-else="">0%</t>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Subjects -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas fa-book text-info fa-2x"></i>
+                                </div>
+                            </div>
+                            <h3 class="h4 mb-1 text-info" t-out="subjects_count or '0'">0</h3>
+                            <p class="text-muted mb-0 small">Total Subjects</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 pb-0">
+                            <h5 class="card-title mb-0">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- View Attendance -->
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="/student_management/student/attendance/view" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3 text-decoration-none">
+                                        <i class="fas fa-calendar fa-2x mb-2"></i>
+                                        <span>View Attendance</span>
+                                    </a>
+                                </div>
+
+                                <!-- View Results -->
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="/student_management/student/results/view" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3 text-decoration-none">
+                                        <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                        <span>View Results</span>
+                                    </a>
+                                </div>
+
+                                <!-- Apply for Leave -->
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="/student_management/student/leave/apply" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3 text-decoration-none">
+                                        <i class="fas fa-calendar-minus fa-2x mb-2"></i>
+                                        <span>Apply for Leave</span>
+                                    </a>
+                                </div>
+
+                                <!-- Submit Feedback -->
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="/student_management/student/feedback" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3 text-decoration-none">
+                                        <i class="fas fa-comment fa-2x mb-2"></i>
+                                        <span>Submit Feedback</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Info & Attendance by Subject -->
+            <div class="row">
+                <!-- Academic Information -->
+                <div class="col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-white border-0 pb-0">
+                            <h5 class="card-title mb-0">Academic Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>Course:</strong>
+                                        <span t-esc="course_name"/>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>Session:</strong>
+                                        <span t-esc="session_name"/>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>Enrollment Date:</strong>
+                                        <span t-esc="student.create_date"/>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>Last Profile Update:</strong>
+                                        <span t-esc="student.write_date"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance by Subject -->
+                <div class="col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-white border-0 pb-0">
+                            <h5 class="card-title mb-0">Attendance by Subject</h5>
+                        </div>
+                        <div class="card-body">
+                            <t t-if="subject_data">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject</th>
+                                                <th>Present</th>
+                                                <th>Absent</th>
+                                                <th>%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="subject_data" t-as="subject">
+                                                <tr>
+                                                    <td t-esc="subject['name']"/>
+                                                    <td>
+                                                        <span class="badge bg-success" t-esc="subject['present_count']"/>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-danger" t-esc="subject['absent_count']"/>
+                                                    </td>
+                                                    <td>
+                                                        <t t-set="total_classes" t-value="subject['present_count'] + subject['absent_count']"/>
+                                                        <t t-if="total_classes > 0">
+                                                            <span class="badge" 
+                                                                  t-attf-class="badge {{ 'bg-success' if (subject['present_count']/total_classes)*100 >= 75 else 'bg-warning' if (subject['present_count']/total_classes)*100 >= 50 else 'bg-danger' }}">
+                                                                <t t-esc="round((subject['present_count']/total_classes)*100, 2)"/>%
+                                                            </span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="badge bg-secondary">N/A</span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                                    <p class="mb-0">No attendance records found</p>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 pb-0">
+                            <h5 class="card-title mb-0">Recent Activities</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-sign-in-alt text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <p class="mb-0 small">Last Login</p>
+                                            <small class="text-muted" t-out="request.env.user.login_date or 'Never'"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <p class="mb-0 small">Current Status</p>
+                                            <small class="text-muted">Active</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Font Awesome (icons) -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+            <!-- Page CSS tweaks -->
+            <style>
+                .card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+                .card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; }
+                .btn-outline-primary:hover,
+                .btn-outline-success:hover,
+                .btn-outline-warning:hover,
+                .btn-outline-info:hover { transform: translateY(-1px); transition: all 0.2s ease-in-out; }
+                .list-group-item-action:hover { background-color: rgba(0,0,0,0.02); }
+                .badge { font-size: 0.75em; }
+            </style>
         </t>
     </template>
 </odoo>

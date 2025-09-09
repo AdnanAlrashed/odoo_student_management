@@ -90,72 +90,89 @@ class Subject(models.Model):
     )
 
     def _compute_attendance_count(self):
-        for record in self:
-            record.attendance_count = len(record.attendance_ids)
+        """Compute attendance count efficiently"""
+        for subject in self:
+            subject.attendance_count = len(subject.attendance_ids)
 
     def _compute_result_count(self):
-        for record in self:
-            record.result_count = len(record.result_ids)
+        """Compute result count efficiently"""
+        for subject in self:
+            subject.result_count = len(subject.result_ids)
+
+    def _compute_student_count(self):
+        """Compute student count efficiently"""
+        for subject in self:
+            subject.student_count = len(subject.student_ids)
 
     @api.constrains('subject_name', 'course_id')
     def _check_subject_name_unique_per_course(self):
-        for record in self:
-            if record.subject_name and record.course_id:
+        """Check subject name uniqueness per course"""
+        for subject in self:
+            if subject.subject_name and subject.course_id:
                 existing = self.search([
-                    ('id', '!=', record.id),
-                    ('subject_name', '=', record.subject_name),
-                    ('course_id', '=', record.course_id.id)
-                ])
+                    ('id', '!=', subject.id),
+                    ('subject_name', '=', subject.subject_name),
+                    ('course_id', '=', subject.course_id.id)
+                ], limit=1)
                 if existing:
                     raise ValidationError(
-                        f"Subject '{record.subject_name}' already exists in course '{record.course_id.course_name}'."
+                        f"Subject '{subject.subject_name}' already exists in course '{subject.course_id.course_name}'."
                     )
 
     @api.constrains('subject_code')
     def _check_subject_code_unique(self):
-        for record in self:
-            if record.subject_code:
+        """Check subject code uniqueness"""
+        for subject in self:
+            if subject.subject_code:
                 existing = self.search([
-                    ('id', '!=', record.id),
-                    ('subject_code', '=', record.subject_code)
-                ])
+                    ('id', '!=', subject.id),
+                    ('subject_code', '=', subject.subject_code)
+                ], limit=1)
                 if existing:
                     raise ValidationError(
-                        f"Subject code '{record.subject_code}' already exists."
+                        f"Subject code '{subject.subject_code}' already exists."
                     )
 
     @api.constrains('credits')
     def _check_credits(self):
-        for record in self:
-            if record.credits and record.credits <= 0:
-                raise ValidationError(
-                    "Subject credits must be greater than 0."
-                )
+        """Validate credits value"""
+        for subject in self:
+            if subject.credits and subject.credits <= 0:
+                raise ValidationError("Subject credits must be greater than 0.")
 
     def action_view_attendance(self):
         """Action to view attendance records for this subject"""
+        self.ensure_one()
         return {
             'name': f'Attendance - {self.subject_name}',
             'type': 'ir.actions.act_window',
             'res_model': 'student_management.attendance',
             'view_mode': 'tree,form',
             'domain': [('subject_id', '=', self.id)],
-            'context': {'default_subject_id': self.id},
+            'context': {
+                'default_subject_id': self.id,
+                'default_course_id': self.course_id.id,
+            },
         }
 
     def action_view_results(self):
         """Action to view student results for this subject"""
+        self.ensure_one()
         return {
             'name': f'Results - {self.subject_name}',
             'type': 'ir.actions.act_window',
             'res_model': 'student_management.student_result',
             'view_mode': 'tree,form',
             'domain': [('subject_id', '=', self.id)],
-            'context': {'default_subject_id': self.id},
+            'context': {
+                'default_subject_id': self.id,
+                'default_course_id': self.course_id.id,
+            },
         }
 
     def action_take_attendance(self):
         """Action to take attendance for this subject"""
+        self.ensure_one()
         return {
             'name': f'Take Attendance - {self.subject_name}',
             'type': 'ir.actions.act_window',
@@ -169,44 +186,61 @@ class Subject(models.Model):
         }
 
     def name_get(self):
+        """Custom display name with subject code and course"""
         result = []
-        for record in self:
-            name = record.subject_name
-            if record.subject_code:
-                name = f"[{record.subject_code}] {name}"
-            if record.course_id:
-                name = f"{name} ({record.course_id.course_name})"
-            result.append((record.id, name))
+        for subject in self:
+            name_parts = []
+            if subject.subject_code:
+                name_parts.append(f"[{subject.subject_code}]")
+            name_parts.append(subject.subject_name)
+            if subject.course_id:
+                name_parts.append(f"({subject.course_id.course_name})")
+            result.append((subject.id, " ".join(name_parts)))
         return result
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         """Enhanced name search to include subject code and course name"""
         args = args or []
+        domain = []
         if name:
-            domain = [
-                '|', '|',
-                ('subject_name', operator, name),
-                ('subject_code', operator, name),
-                ('course_id.course_name', operator, name)
-            ]
-            subjects = self.search(domain + args, limit=limit)
-            return subjects.name_get()
-        return super().name_search(name, args, operator, limit)
-
-    def _compute_student_count(self):
-        for record in self:
-            record.student_count = len(record.student_ids)
+            domain = ['|', '|', 
+                     ('subject_name', operator, name),
+                     ('subject_code', operator, name),
+                     ('course_id.course_name', operator, name)]
+            if operator in ('=', 'ilike', '=like', 'like'):
+                domain = ['|', '|', 
+                         ('subject_name', operator, name),
+                         ('subject_code', operator, name),
+                         ('course_id.course_name', operator, name)]
+        
+        subjects = self.search(domain + args, limit=limit)
+        return subjects.name_get()
 
     def action_activate(self):
-        self.ensure_one()
-        self.write({'active': True})
+        """Activate subject"""
+        for subject in self:
+            subject.write({'active': True})
         return True
 
     def action_deactivate(self):
-        self.ensure_one()
-        self.write({'active': False})
+        """Deactivate subject"""
+        for subject in self:
+            subject.write({'active': False})
         return True
 
+    def read(self, fields=None, load='_classic_read'):
+        """Optimize read performance for large datasets"""
+        if fields and 'student_ids' in fields and len(self) > 50:
+            fields = [f for f in fields if f != 'student_ids']
+        return super().read(fields=fields, load=load)
 
+    def copy(self, default=None):
+        """Override copy method to handle unique constraints"""
+        default = default or {}
+        if 'subject_code' not in default:
+            default['subject_code'] = f"{self.subject_code}_COPY"
+        if 'subject_name' not in default:
+            default['subject_name'] = f"{self.subject_name} (Copy)"
+        return super().copy(default)
 
